@@ -1,0 +1,89 @@
+################## Import libraries ##################
+
+import pandas as pd
+import os
+import sys
+from subprocess import call
+import itertools
+from snakemake.utils import R
+
+
+################## Configuration file and PATHS##################
+
+configfile: "config.yaml"
+
+WORKING_DIR         = config["working_dir"]
+RESULT_DIR          = config["results_dir"]
+DATA_DIR            = config["data_dir"]
+GENOME_FASTA_URL    = config["genome_fasta_url"]
+
+#units = pd.read_table(config["units"], dtype=str).set_index(["bed"], drop=False)
+
+#BED = units.index.get_level_values('bed').unique().tolist()
+
+units = pd.read_table(config["sample"], dtype=str).set_index(["sample"], drop=False)
+
+SAMPLES = units.index.get_level_values('sample').unique().tolist()
+
+###############
+# Helper Functions
+###############
+def get_fastq(wildcards):
+    return units.loc[(sample), ["fq1", "fq2"]].dropna()
+
+################## DESIRED OUTPUT ##################
+
+FASTQC  = expand(RESULT_DIR + "fastqc/{samples}_{R}_2000reads_fastqc.html", samples = SAMPLES, R=['R1', 'R2'])
+
+
+
+rule all:
+    input:
+        FASTQC,
+        WORKING_DIR + "reference",
+        [WORKING_DIR + "genome." + str(i) + ".bt2" for i in range(1,4)],
+        WORKING_DIR + "genome.rev.1.bt2",
+        WORKING_DIR + "genome.rev.2.bt2"
+    message : "Analysis is complete!"
+    shell:""
+
+################## INCLUDE RULES ##################
+rule download_genome:
+    output:
+        WORKING_DIR + "reference",
+    shell:
+        "wget -O {output} {GENOME_FASTA_URL}"
+
+rule index_genome:
+    input:
+        WORKING_DIR + "reference",
+    output:
+        [WORKING_DIR + "genome." + str(i) + ".bt2" for i in range(1,4)],
+        WORKING_DIR + "genome.rev.1.bt2",
+        WORKING_DIR + "genome.rev.2.bt2"
+    message:"Indexing Reference genome"
+    params:
+        WORKING_DIR + "genome"
+    conda:
+        "envs/samtools_bowtie.yaml"
+    shell:
+        "bowtie2-build --threads 10 {input} {params}"
+
+rule trimmomatic:
+    input:
+        
+
+rule fastqc:
+    input:
+        fwd = expand(DATA_DIR + "{samples}_R1_2000reads.fq.gz", samples = SAMPLES),
+        rev = expand(DATA_DIR + "{samples}_R2_2000reads.fq.gz", samples = SAMPLES)
+    output:
+        expand(RESULT_DIR + "fastqc/{samples}_{R}_2000reads_fastqc.html", samples = SAMPLES, R=['R1', 'R2'])
+    log:
+        expand(RESULT_DIR + "logs/fastqc/{samples}.fastqc.log", samples = SAMPLES)
+    params:
+        RESULT_DIR + "fastqc/"
+    conda:
+        "envs/fastqc.yaml"
+    shell:
+        "fastqc --outdir={params} {input.fwd} {input.rev} &>{log}"

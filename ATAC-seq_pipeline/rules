@@ -1,0 +1,147 @@
+#######Configuration files#######
+
+
+
+GENOME_FASTA_URL = config[‘genome_fasta_url’]
+
+WORKING_DIR = config[working_dir]
+
+RESULT_DIR = config[results_dir]
+
+
+
+
+
+#######Rules###########
+
+
+
+rule download_genome:
+
+output:
+
+WORKING_DIR + “reference.fa”
+
+shell:
+
+“wget -o {output} {GENOME_FASTA_URL}”
+
+
+
+# download the file from GENOME_FASTA_URL link and save the file to {output}
+
+
+
+rule fastqc:
+
+input:
+
+fwd = WORKING_DIR + “{samples}_fwd.fq”
+
+rev = WORKING_DIR + “{samples}_rev.fq”
+
+output:
+
+R1 = RESULT_DIR + “fastqc/{samples}_fwd.fq.gz”
+
+R2 = RESULT_DIR + “fastqc/{samples}_rev.fq.gz”
+
+shell:
+
+“fastqc -o {output} -t 10 {input}”
+
+
+
+# fastqc [-o output dir] [--(no)extract] [-f fastq|bam|sam] [-c contaminant file] seqfile1 .. seqfileN
+
+
+
+rule trimmomatic:
+
+input:
+
+R1 = RESULT_DIR + “fastqc/{samples}_fwd.fq.gz”
+
+R2 = RESULT_DIR + “fastqc/{samples}_rev.fq.gz”
+
+output:
+
+forward = WORKING_DIR + “trimmed/{samples}_forward.fq.gz”
+
+reverse = WORKING_DIR + “trimmed/{samples}_reverse.fq.gz”
+
+shell:
+
+“java -jar trimmomatic-0.35.jar PE -phred33 {input} {output}”
+
+
+
+rule fastqc2:
+
+input:
+
+forward = WORKING_DIR + “trimmed/{samples}_forward.fq.gz”
+
+reverse = WORKING_DIR + “trimmed/{samples}_reverse.fq.gz”output:
+
+RESULT_DIR + “fastqc/{samples}_forward_posttrim.fq.gz”
+
+RESULT_DIR + “fastqc/{samples}_reverse_posttrim.fq.gz”
+
+shell:
+
+“fastqc -o {output} -t 6 {input}”
+
+
+
+rule index:
+
+input:
+
+WORKING_DIR + “reference.fa”
+
+output:
+
+WORKING_DIR + “genome.rev.1.bt2”
+
+WORKING_DIR + “genome.rev.2.bt2”
+
+message:
+
+“index reference genome”
+
+params:
+
+WORKING_DIR + “genome_index”
+
+shell:
+
+“bowtie2-build –threads 10 {input}{params}”
+
+
+
+rule align:
+
+input:
+
+index = WORKING_DIR + “genome_index”
+
+forward = WORKING_DIR + “trimmed/{samples}_forward.fq.gz”
+
+reverse = WORKING_DIR + “trimmed/{samples}_reverse.fq.gz”
+
+params:
+
+index = WORKING_DIR + “genome_index”
+
+output:
+
+WORKING_DIR + “mapped/{sample}.bam”
+
+message:
+
+“mapping samples to reference genome”
+
+shell:
+
+“bowtie2 -t 10 {params.index} -1 {input.forward} -2{input.reverse} | samtools view -Sb - > {output}”

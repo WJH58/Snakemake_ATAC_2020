@@ -1,0 +1,3 @@
+sample	fq1	fq2
+WT8	../data/WT8_R1_2000reads.fq.gz	../data/WT8_R2_2000reads.fq.gz
+KO12	../data/KO12_R1_10reads.fq.gz	../data/KO12_R2_10reads.fq.gz

@@ -1,0 +1,19 @@
+## directories ##
+
+working_dir: "temp/"
+
+results_dir: "results/"
+
+data_dir: "../data/"
+
+sample : "units.tsv"
+
+## genome reference ##
+
+genome_fasta_url : "ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M17/GRCm38.primary_assembly.genome.fa.gz"
+
+
+
+## trimmomatic ##
+
+adapters: "adapters.fasta"
