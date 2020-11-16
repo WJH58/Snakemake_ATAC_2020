@@ -15,5 +15,14 @@ genome_fasta_url : "ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/rele
 
 
 ## trimmomatic ##
-
-adapters: "adapters.fasta"
+trimmomatic:
+  adapters:               "adapters.fasta"
+  seedMisMatches:         '2'
+  palindromeClipTreshold: '30'
+  simpleClipThreshold:    '10'
+  LeadMinTrimQual:        '3'
+  TrailMinTrimQual:       '3'
+  windowSize:             '4'
+  avgMinQual:             '15'
+  minReadLength:          '40'
+  phred:                  '-phred33'
