@@ -118,6 +118,19 @@ rule trimmomatic:
          SLIDINGWINDOW:4:15 \
          MINLEN:40 &>{log}
         """
+rule trimmed_fastqc:
+    input:
+        forward_reads   = WORKING_DIR + "trimmed/{samples}_forward.fastq.gz",
+        reverse_reads   = WORKING_DIR + "trimmed/{samples}_reverse.fastq.gz"
+    output:
+        RESULT_DIR + "fastqc/{samples}_{R}_trimmed_fastqc.html"
+    params:
+        RESULT_DIR + "fastqc/"
+    conda:
+        "envs/fastqc.yaml"
+    shell:
+        "fastqc --outdir={params} {input.forward_reads} {input.reverse_reads} &>{log}"
+
 
 rule fastqc:
     input:
