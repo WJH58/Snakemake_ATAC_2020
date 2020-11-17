@@ -6,7 +6,7 @@ results_dir: "results/"
 
 data_dir: "../data/"
 
-sample : "units.tsv"
+units : "units.tsv"
 
 ## genome reference ##
 

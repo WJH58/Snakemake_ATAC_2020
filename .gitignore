@@ -1,2 +1,3 @@
 .DS_Store
 ATAC-seq_pipeline/temp/*
+ATAC-seq_pipeline/.snakemake/*

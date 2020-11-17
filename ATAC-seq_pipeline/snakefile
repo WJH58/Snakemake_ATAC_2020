@@ -20,8 +20,7 @@ GENOME_FASTA_URL    = config["genome_fasta_url"]
 #units = pd.read_table(config["units"], dtype=str).set_index(["bed"], drop=False)
 
 #BED = units.index.get_level_values('bed').unique().tolist()
-
-units = pd.read_table(config["sample"], dtype=str).set_index(["sample"], drop=False)
+units = pd.read_table(config["units"], dtype=str).set_index(["sample"], drop=False)
 
 SAMPLES = units.index.get_level_values('sample').unique().tolist()
 
@@ -29,13 +28,24 @@ SAMPLES = units.index.get_level_values('sample').unique().tolist()
 # Helper Functions
 ###############
 def get_fastq(wildcards):
-    return units.loc[(sample), ["fq1", "fq2"]].dropna()
+    return units.loc[(wildcards.samples), ["fq1", "fq2"]].dropna()
+
+
+##############
+# Wildcards
+##############
+wildcard_constraints:
+    sample = "[A-Za-z0-9]+"
+
+wildcard_constraints:
+    unit = "L[0-9]+"
+
 
 ################## DESIRED OUTPUT ##################
 
-FASTQC  = expand(RESULT_DIR + "fastqc/{samples}_{R}_2000reads_fastqc.html", samples = SAMPLES, R=['R1', 'R2'])
-
-
+FASTQC          = expand(RESULT_DIR + "fastqc/{samples}_{R}_2000reads_fastqc.html", samples = SAMPLES, R=['R1', 'R2']),
+FORWARD_READS   = expand(WORKING_DIR + "trimmed/{samples}_forward.fastq.gz", samples = SAMPLES),
+REVERSE_READS   = expand(WORKING_DIR + "trimmed/{samples}_reverse.fastq.gz", samples = SAMPLES),
 
 rule all:
     input:
@@ -43,9 +53,9 @@ rule all:
         WORKING_DIR + "reference",
         [WORKING_DIR + "genome." + str(i) + ".bt2" for i in range(1,4)],
         WORKING_DIR + "genome.rev.1.bt2",
-        WORKING_DIR + "genome.rev.2.bt2"
-        WORKING_DIR + "trimmed/{samples}_forward.fastq.gz",
-        WORKING_DIR + "trimmed/{samples}_reverse.fastq.gz",
+        WORKING_DIR + "genome.rev.2.bt2",
+        FORWARD_READS,
+        REVERSE_READS
     message : "Analysis is complete!"
     shell:""
 
@@ -79,9 +89,9 @@ rule trimmomatic:
         forward_reads   = WORKING_DIR + "trimmed/{samples}_forward.fastq.gz",
         reverse_reads   = WORKING_DIR + "trimmed/{samples}_reverse.fastq.gz",
         forwardUnpaired = temp(WORKING_DIR + "trimmed/{samples}_forward_unpaired.fastq.gz"),
-        reverseUnpaired = temp(WORKING_DIR + "trimmed/{samples}_reverse_unpaired.fastq.gz")
+        reverseUnpaired = temp(WORKING_DIR + "trimmed/{samples}_reverse_unpaired.fastq.gz"),
     log:
-        RESULT_DIR + "logs/trimmomatic/{sample}.log"
+        RESULT_DIR + "logs/trimmomatic/{samples}.log"
     params:
         seedMisMatches =            str(config['trimmomatic']['seedMisMatches']),
         palindromeClipTreshold =    str(config['trimmomatic']['palindromeClipTreshold']),
@@ -94,19 +104,20 @@ rule trimmomatic:
         phred = 		            str(config["trimmomatic"]["phred"])
     threads: 10
     conda:
-        "../envs/trimmomatic.yaml"
+        "envs/trimmomatic.yaml"
     shell:
-        "trimmomatic PE {params.phred} -threads {threads} "
-        "{input.reads} "
-        "{output.forward_reads} "
-        "{output.forwardUnpaired} "
-        "{output.reverse_reads} "
-        "{output.reverseUnpaired} "
-        "ILLUMINACLIP:{input.adapters}:{params.seedMisMatches}:{params.palindromeClipTreshold}:{params.simpleClipThreshhold} "
-        "LEADING:{params.LeadMinTrimQual} "
-        "TRAILING:{params.TrailMinTrimQual} "
-        "SLIDINGWINDOW:{params.windowSize}:{params.avgMinQual} "
-        "MINLEN:{params.minReadLen} &>{log}"
+        """
+        java -jar trimmomatic-0.32.jar PE \
+        -threads 10 \
+        -phred33 \
+         {input.reads} \
+         {output.forward_reads} {output.forwardUnpaired} {output.reverse_reads} {output.reverseUnpaired} \
+         ILLUMINACLIP:{input.adapters}:{params.seedMisMatches}:{params.palindromeClipTreshold}:{params.simpleClipThreshhold} \
+         LEADING:3 \
+         TRAILING:3 \
+         SLIDINGWINDOW:4:15 \
+         MINLEN:40 &>{log}
+        """
 
 rule fastqc:
     input:
