@@ -46,6 +46,8 @@ wildcard_constraints:
 FASTQC          = expand(RESULT_DIR + "fastqc/{samples}_{R}_2000reads_fastqc.html", samples = SAMPLES, R=['R1', 'R2']),
 FORWARD_READS   = expand(WORKING_DIR + "trimmed/{samples}_forward.fastq.gz", samples = SAMPLES),
 REVERSE_READS   = expand(WORKING_DIR + "trimmed/{samples}_reverse.fastq.gz", samples = SAMPLES),
+TRIMMED_FASTQC  = expand(RESULT_DIR + "fastqc/{samples}_{R}_trimmed_fastqc.html", samples = SAMPLES, R=['R1', 'R2']),
+
 
 rule all:
     input:
@@ -55,7 +57,8 @@ rule all:
         WORKING_DIR + "genome.rev.1.bt2",
         WORKING_DIR + "genome.rev.2.bt2",
         FORWARD_READS,
-        REVERSE_READS
+        REVERSE_READS,
+        TRIMMED_FASTQC,
     message : "Analysis is complete!"
     shell:""
 
@@ -130,7 +133,6 @@ rule trimmed_fastqc:
         "envs/fastqc.yaml"
     shell:
         "fastqc --outdir={params} {input.forward_reads} {input.reverse_reads} &>{log}"
-
 
 rule fastqc:
     input:
