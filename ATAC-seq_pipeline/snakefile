@@ -47,8 +47,8 @@ FASTQC          = expand(RESULT_DIR + "fastqc/{samples}_{R}_2000reads_fastqc.htm
 FORWARD_READS   = expand(WORKING_DIR + "trimmed/{samples}_forward.fastq.gz", samples = SAMPLES),
 REVERSE_READS   = expand(WORKING_DIR + "trimmed/{samples}_reverse.fastq.gz", samples = SAMPLES),
 TRIMMED_FASTQC  = expand(RESULT_DIR + "fastqc/{samples}_{R}_trimmed_fastqc.html", samples = SAMPLES, R=['R1', 'R2']),
-MAPPED = expand(WORKING_DIR + "mapped/{samples}.bam", samples = SAMPLES),
-UNMAPPED = [WORKING_DIR + "unmapped/{samples}.fq." + str(i) +".gz" for i in range(1,2)],
+#MAPPED = expand(WORKING_DIR + "mapped/{samples}.bam", samples = SAMPLES),
+#UNMAPPED = [WORKING_DIR + "unmapped/{samples}.fq." + str(i) +".gz" for i in range(1,2)],
 
 rule all:
     input:
@@ -152,26 +152,26 @@ rule fastqc:
     shell:
         "fastqc --outdir={params} {input.fwd} {input.rev} &>{log}"
 
-rule mapping:
-    input:
-        foward = WORKING_DIR + "trimmed/{samples}_forward.fastq.gz",
-        reverse = WORKING_DIR + "trimmed/{samples}_reverse.fastq.gz",
-        forwardUnpaired = WORKING_DIR + "trimmed/{samples}_forward_unpaired.fastq.gz",
-        reverseUnpaired = WORKING_DIR + "trimmed/{samples}_reverse_unpaired.fastq.gz",
-        index = [WORKING_DIR + "genome." + str(i) + ".bt2" for i in range(1,4)]
-    output:
-        mapped = WORKING_DIR + "mapped/{samples}.bam",
-        unmapped = [WORKING_DIR + "unmapped/{samples}.fq." + str(i) +".gz" for i in range(1,2)],
-    params:
-        bowtie          = " ".join(config["bowtie2"]["params"].values()), #take argument separated as a list separated with a space
-        index           = WORKING_DIR + "genome",
-        unmapped        = WORKING_DIR + "unmapped/{samples}.fq.gz"
-    threads: 10
-    conda:
-        "../envs/samtools_bowtie.yaml"
-    log:
-        RESULT_DIR + "logs/bowtie/{samples}.log"
-    shell:
-        """
-        bowtie2 {params.bowtie} --threads {threads} -x {params.index} -1 {input.forward} -2 {input.reverse} -U {input.forwardUnpaired},{input.reverseUnpaired} --un-conc-gz {params.unmapped} | samtools view -Sb - > {output.mapped} 2>{log}
-        """
+#rule mapping:
+    #input:
+        #foward = WORKING_DIR + "trimmed/{samples}_forward.fastq.gz",
+        #reverse = WORKING_DIR + "trimmed/{samples}_reverse.fastq.gz",
+        #forwardUnpaired = WORKING_DIR + "trimmed/{samples}_forward_unpaired.fastq.gz",
+        #reverseUnpaired = WORKING_DIR + "trimmed/{samples}_reverse_unpaired.fastq.gz",
+        #index = [WORKING_DIR + "genome." + str(i) + ".bt2" for i in range(1,4)]
+    #output:
+        #mapped = WORKING_DIR + "mapped/{samples}.bam",
+        #unmapped = [WORKING_DIR + "unmapped/{samples}.fq." + str(i) +".gz" for i in range(1,2)],
+    #params:
+        #bowtie          = " ".join(config["bowtie2"]["params"].values()), #take argument separated as a list separated with a space
+        #index           = WORKING_DIR + "genome",
+        #unmapped        = WORKING_DIR + "unmapped/{samples}.fq.gz"
+    #threads: 10
+    #conda:
+        #"../envs/samtools_bowtie.yaml"
+    #log:
+        #RESULT_DIR + "logs/bowtie/{samples}.log"
+    #shell:
+        #"""
+        #bowtie2 {params.bowtie} --threads {threads} -x {params.index} -1 {input.forward} -2 {input.reverse} -U {input.forwardUnpaired},{input.reverseUnpaired} --un-conc-gz {params.unmapped} | samtools view -Sb - > {output.mapped} 2>{log}
+        #"""
