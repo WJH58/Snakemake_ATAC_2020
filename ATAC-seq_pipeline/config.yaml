@@ -26,3 +26,12 @@ trimmomatic:
   avgMinQual:             '15'
   minReadLength:          '40'
   phred:                  '-phred33'
+
+# bowtie2 parameters
+bowtie2:
+  params:
+    mode:             "--local"
+    sensitivity:      "--very-sensitive-local"
+    max_fragment_len: "--maxins 500"                # maximum fragment length for valid paired-end alignments
+    min_fragment_len: "--minins 80"                 # minimum fragment length for valid paired-end alignments
+    verbose:          "-q"
