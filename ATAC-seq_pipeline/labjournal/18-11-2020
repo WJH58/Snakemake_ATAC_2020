@@ -1,0 +1,37 @@
+rule mapping:
+    input:
+        forward_reads = WORKING_DIR + "trimmed/{samples}_forward.fastq.gz",
+        reverse_reads = WORKING_DIR + "trimmed/{samples}_reverse.fastq.gz",
+        forwardUnpaired = WORKING_DIR + "trimmed/{samples}_forward_unpaired.fastq.gz",
+        reverseUnpaired = WORKING_DIR + "trimmed/{samples}_reverse_unpaired.fastq.gz",
+        index = [WORKING_DIR + "genome." + str(i) + ".bt2" for i in range(1,4)]
+    output:
+        mapped = WORKING_DIR + "mapped/{samples}.bam",
+        unmapped = [WORKING_DIR + "unmapped/{samples}.fq." + str(i) +".gz" for i in range(1,2)],
+    params:
+        bowtie          = " ".join(config["bowtie2"]["params"].values()), #take argument separated as a list separated with a space
+        index           = WORKING_DIR + "genome",
+        unmapped        = WORKING_DIR + "unmapped/{samples}.fq.gz"
+    threads: 10
+    conda:
+        "../envs/samtools_bowtie.yaml"
+    log:
+        RESULT_DIR + "logs/bowtie/{samples}.log"
+    shell:
+        """
+        bowtie2 {params.bowtie} --threads {threads} -x {params.index} -1 {input.forward_reads} -2 {input.reverse_reads} -U {input.forwardUnpaired},{input.reverseUnpaired} --un-conc-gz {params.unmapped} | samtools view -Sb - > {output.mapped} 2>{log}
+        """
+# -x <bt2-idx> The basename of the idex for the reference genome. The basename is the name of any of the index files up to but not including the final (.1.bt2; rev.1.bt2 etc)
+# -1 comma-separated list of forward reads files
+# -2 comma-separated list of reverse reads files
+# -U comma-separated list of files containing unpaired reads to be aligned.
+# output options: --un-gz <path> write unpaired reads that failed to align concordantly to file at <path>, and will be gzip comppressed.
+
+#samtools view -Sb: convert SAM format to BAM format.
+
+Functions of samtools:
+1. convert from other alignment formats
+2. sort and merge alignments
+3. label PCR duplicates
+4. call SNP and short indel variants
+5. show alignments in text-based viewer
