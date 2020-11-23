@@ -131,6 +131,8 @@ rule trimmed_fastqc:
         reverse_reads   = WORKING_DIR + "trimmed/{samples}_reverse.fastq.gz"
     output:
         RESULT_DIR + "fastqc/{samples}_{R}_trimmed_fastqc.html"
+    log:
+        RESULT_DIR + "logs/fastqc/{samples}.trimmed_fastqc.log"
     params:
         RESULT_DIR + "fastqc/"
     conda:
