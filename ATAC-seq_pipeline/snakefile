@@ -17,9 +17,9 @@ RESULT_DIR          = config["results_dir"]
 DATA_DIR            = config["data_dir"]
 GENOME_FASTA_URL    = config["genome_fasta_url"]
 
-units = pd.read_table(config["units"], dtype=str).set_index(["bed"], drop=False)
+#units = pd.read_table(config["units"], dtype=str).set_index(["bed"], drop=False)
 
-BED = units.index.get_level_values('bed').unique().tolist()
+#BED = units.index.get_level_values('bed').unique().tolist()
 units = pd.read_table(config["units"], dtype=str).set_index(["sample"], drop=False)
 
 SAMPLES = units.index.get_level_values('sample').unique().tolist()
