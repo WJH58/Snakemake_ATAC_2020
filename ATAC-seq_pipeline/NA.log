@@ -1,0 +1,5 @@
+Version:	1.2.10
+Arguments Used:
+-b	temp/sort/WT8.sorted.bam
+-i	temp/index/WT8.sorted.bam.bai
+-g	genome.info

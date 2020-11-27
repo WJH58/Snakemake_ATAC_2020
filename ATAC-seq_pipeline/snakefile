@@ -50,7 +50,9 @@ TRIMMED_FASTQC  = expand(RESULT_DIR + "trimmed_fastqc/WT8_{direction}_fastqc.htm
 MAPPED = expand(WORKING_DIR + "mapped/{samples}.bam", samples = SAMPLES),
 UNMAPPED = expand([WORKING_DIR + "unmapped/{samples}.fq." + str(i) +".gz" for i in range(1,2)], samples = SAMPLES),
 MAP_SORTED = expand(WORKING_DIR + "sort/{samples}.sorted.bam", samples = SAMPLES),
-SORTED_INDEXED = expand(WORKING_DIR + "index/{samples}.sorted.bam.bai", samples = SAMPLES)
+SORTED_INDEXED = expand(WORKING_DIR + "index/{samples}.sorted.bam.bai", samples = SAMPLES),
+GENOME_INFO = expand(WORKING_DIR + "genome_info/{samples}.genome.info", samples  = SAMPLES),
+GAPPED_PEAK = expand(RESULT_DIR + "peaks/{samples}_peaks.gappedPeak", samples = SAMPLES)
 
 rule all:
     input:
@@ -65,7 +67,9 @@ rule all:
         MAPPED,
         UNMAPPED,
         MAP_SORTED,
-        SORTED_INDEXED
+        SORTED_INDEXED,
+        GENOME_INFO,
+        GAPPED_PEAK
     message : "Analysis is complete!"
     shell:""
 
@@ -180,29 +184,64 @@ rule mapping:
         RESULT_DIR + "logs/bowtie/{samples}.log"
     shell:
         """
-        bowtie2 {params.bowtie} --threads {threads} -x {params.index} -1 {input.forward_reads} -2 {input.reverse_reads} -U {input.forwardUnpaired},{input.reverseUnpaired} --un-conc-gz {params.unmapped} | samtools view -Sb - > {output.mapped} 2>{log}
+        bowtie2 {params.bowtie} --threads {threads} -x {params.index} -1 {input.forward_reads} -2 {input.reverse_reads} -U {input.forwardUnpaired},{input.reverseUnpaired} --un-conc-gz {params.unmapped} | samtools view -Sb - > {output.mapped} 2>&{log}
         """
 
 rule sort:
     input:
         mapped = WORKING_DIR + "mapped/{samples}.bam"
     output:
-        map_sorted = WORKING_DIR + "sort/{samples}.sorted.bam"
+        map_sorted = WORKING_DIR + "sort/{samples}_map.sorted.bam"
     conda:
         "envs/samtools_bowtie.yaml"
     log:
         RESULT_DIR + "logs/sort/{samples}.log"
     shell:
-        "samtools sort {input} -o {output}"
+        "samtools sort {input} -o {output} &>{log}"
 
 rule index:
     input:
-        map_sorted = WORKING_DIR + "sort/{samples}.sorted.bam"
+        map_sorted = WORKING_DIR + "sort/{samples}_map.sorted.bam"
     output:
-        sorted_indexed = WORKING_DIR + "index/{samples}.sorted.bam.bai"
+        map_sorted_indexed = WORKING_DIR + "index/{samples}_map.sorted.bam.bai"
     conda:
         "envs/samtools_bowtie.yaml"
     log:
         RESULT_DIR + "logs/index/{samples}.log"
     shell:
-        "samtools index {input} {output}"
+        "samtools index {input} {output} &>{log}"
+
+rule get_genome_info:
+    input:
+        map_sorted = WORKING_DIR + "sort/{samples}.sorted.bam"
+    output:
+        genome_info = WORKING_DIR + "genome_info/{samples}.genome.info"
+    conda:
+        "envs/perl.yaml"
+    shell:
+        """
+        samtools view -H {input} | grep SQ | cut -f 2-3 | cut -d ':' -f 2 | cut -f 1 > tmp
+        samtools view -H {input} | grep SQ | cut -f 2-3 | cut -d ':' -f 2,3 | cut -d ':' -f 2 > tmp2
+        paste tmp tmp2 > {output}
+        rm tmp tmp2
+        """
+
+rule peak_calling:
+    input:
+        map_sorted = WORKING_DIR + "sort/{samples}.sorted.bam",
+        map_sorted_indexed = WORKING_DIR + "index/{samples}_map.sorted.bam.bai"
+    output:
+        gapped_peak = RESULT_DIR + "peaks/{samples}_peaks.gappedPeak"
+    params:
+        genome_info = str(config['hmmratac']['genome.info']),
+        upper = 20,
+        lower = 10,
+        output_preflix = "{samples}"
+    log:
+        RESULT_DIR + "logs/peak_calling/{samples}.log"
+    conda:
+        "envs/hmmratac.yaml"
+    shell:
+        """
+        HMMRATAC -b {input.map_sorted} -i {input.map_sorted_indexed} -g {params.genome_info} --output {params.output_preflix} --upper {params.upper} --lower {params.lower} 2&>{log}
+        """

@@ -35,3 +35,7 @@ bowtie2:
     max_fragment_len: "--maxins 500"                # maximum fragment length for valid paired-end alignments
     min_fragment_len: "--minins 80"                 # minimum fragment length for valid paired-end alignments
     verbose:          "-q"
+
+# genome.info
+hmmratac:
+  genome.info: "genome.info"

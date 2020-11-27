@@ -1,0 +1,5 @@
+channels:
+  - bioconda
+dependencies:
+  - perl-bioperl=1.7
+  - samtools=1.9

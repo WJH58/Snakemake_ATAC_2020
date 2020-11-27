@@ -1,0 +1,8 @@
+Version:	1.2.10
+Arguments Used:
+-b	temp/sort/WT8.sorted.bam
+-i	temp/index/WT8_map.sorted.bam.bai
+-g	genome.info
+--output	results/peaks/WT8_peaks.gappedPeak
+--upper	20
+--lower	10
