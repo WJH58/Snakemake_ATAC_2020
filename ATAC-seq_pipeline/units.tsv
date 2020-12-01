@@ -1,3 +1,5 @@
 sample	fq1	fq2
-WT8	../data/WT8_R1_2000reads.fq.gz	../data/WT8_R2_2000reads.fq.gz
-KO12	../data/KO12_R1_10reads.fq.gz	../data/KO12_R2_10reads.fq.gz
+WT1	../data/sample_4_1_R1.fastq.gz	../data/sample_4_1_R2.fastq.gz
+WT2 ../data/sample_8_R1.fastq.gz  ../data/sample_8_R2.fastq.gz
+KO1	../data/sample_4_3_R1.fastq.gz	../data/sample_4_3_R2.fastq.gz
+KO2 ../data/sample_12_R1.fastq.gz ../data/sample_12_R2.fastq.gz

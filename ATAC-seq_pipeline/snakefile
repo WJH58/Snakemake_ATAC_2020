@@ -43,16 +43,17 @@ wildcard_constraints:
 
 ################## DESIRED OUTPUT ##################
 
-FASTQC          = expand(RESULT_DIR + "fastqc/{samples}_{R}_2000reads_fastqc.html", samples = SAMPLES, R=['R1', 'R2']),
+FASTQC          = expand(RESULT_DIR + "fastqc/{samples}_{R}_fastqc.html", samples = SAMPLES, R=['R1', 'R2']),
 FORWARD_READS   = expand(WORKING_DIR + "trimmed/{samples}_forward.fastq.gz", samples = SAMPLES),
 REVERSE_READS   = expand(WORKING_DIR + "trimmed/{samples}_reverse.fastq.gz", samples = SAMPLES),
-TRIMMED_FASTQC  = expand(RESULT_DIR + "trimmed_fastqc/WT8_{direction}_fastqc.html", direction=['forward', 'reverse']),
+TRIMMED_FASTQC  = expand(RESULT_DIR + "trimmed_fastqc/{samples}_{direction}_fastqc.html", samples = SAMPLES, direction=['forward', 'reverse']),
 MAPPED = expand(WORKING_DIR + "mapped/{samples}.bam", samples = SAMPLES),
 UNMAPPED = expand([WORKING_DIR + "unmapped/{samples}.fq." + str(i) +".gz" for i in range(1,2)], samples = SAMPLES),
 MAP_SORTED = expand(WORKING_DIR + "sort/{samples}.sorted.bam", samples = SAMPLES),
 SORTED_INDEXED = expand(WORKING_DIR + "index/{samples}.sorted.bam.bai", samples = SAMPLES),
 GENOME_INFO = expand(WORKING_DIR + "genome_info/{samples}.genome.info", samples  = SAMPLES),
-GAPPED_PEAK = expand(RESULT_DIR + "peaks/{samples}_peaks.gappedPeak", samples = SAMPLES)
+GAPPED_PEAK = expand(RESULT_DIR + "peaks/{samples}_peaks.gappedPeak", samples = SAMPLES),
+NAME_LOG = expand(RESULT_DIR + "peaks/{samples}.log", samples = SAMPLES)
 
 rule all:
     input:
@@ -68,8 +69,10 @@ rule all:
         UNMAPPED,
         MAP_SORTED,
         SORTED_INDEXED,
-        GENOME_INFO,
-        GAPPED_PEAK
+        #GENOME_INFO,
+        #GAPPED_PEAK,
+        #NAME_LOG
+
     message : "Analysis is complete!"
     shell:""
 
@@ -135,25 +138,25 @@ rule trimmomatic:
 
 rule trimmed_fastqc:
     input:
-        WT8forward = WORKING_DIR + "trimmed/WT8_forward.fastq.gz",
-        WT8reverse = WORKING_DIR + "trimmed/WT8_reverse.fastq.gz"
+        forward_reads = WORKING_DIR + "trimmed/{samples}_forward.fastq.gz",
+        reverse_reads = WORKING_DIR + "trimmed/{samples}_reverse.fastq.gz"
     output:
-        RESULT_DIR + "trimmed_fastqc/WT8_{direction}_fastqc.html"
+        RESULT_DIR + "trimmed_fastqc/{samples}_{direction}_fastqc.html"
     params:
         RESULT_DIR + "trimmed_fastqc/"
     conda:
         "envs/fastqc.yaml"
     log:
-        RESULT_DIR + "logs/trimmed_fastqc/WT8_{direction}.fastqc.log"
+        RESULT_DIR + "logs/trimmed_fastqc/{samples}_{direction}.fastqc.log"
     shell:
-        "fastqc --outdir={params} {input.WT8forward} {input.WT8reverse} &>{log}"
+        "fastqc --outdir={params} {input.forward_reads} {input.reverse_reads} &>{log}"
 
 rule fastqc:
     input:
-        fwd = expand(DATA_DIR + "{samples}_R1_2000reads.fq.gz", samples = SAMPLES),
-        rev = expand(DATA_DIR + "{samples}_R2_2000reads.fq.gz", samples = SAMPLES)
+        fwd = expand(DATA_DIR + "sample_{numbers}_R1.fastq.gz", numbers = ['8','12','4_3','4_1']),
+        rev = expand(DATA_DIR + "sample_{numbers}_R2.fastq.gz", numbers = ['8','12','4_3','4_1'])
     output:
-        expand(RESULT_DIR + "fastqc/{samples}_{R}_2000reads_fastqc.html", samples = SAMPLES, R=['R1', 'R2'])
+        expand(RESULT_DIR + "fastqc/{samples}_{R}_fastqc.html", samples = SAMPLES, R=['R1', 'R2'])
     log:
         expand(RESULT_DIR + "logs/fastqc/{samples}.fastqc.log", samples = SAMPLES)
     params:
@@ -184,14 +187,14 @@ rule mapping:
         RESULT_DIR + "logs/bowtie/{samples}.log"
     shell:
         """
-        bowtie2 {params.bowtie} --threads {threads} -x {params.index} -1 {input.forward_reads} -2 {input.reverse_reads} -U {input.forwardUnpaired},{input.reverseUnpaired} --un-conc-gz {params.unmapped} | samtools view -Sb - > {output.mapped} 2>&{log}
+        bowtie2 {params.bowtie} --threads {threads} -x {params.index} -1 {input.forward_reads} -2 {input.reverse_reads} -U {input.forwardUnpaired},{input.reverseUnpaired} --un-conc-gz {params.unmapped} | samtools view -Sb - > {output.mapped} >&{log}
         """
 
 rule sort:
     input:
         mapped = WORKING_DIR + "mapped/{samples}.bam"
     output:
-        map_sorted = WORKING_DIR + "sort/{samples}_map.sorted.bam"
+        map_sorted = WORKING_DIR + "sort/{samples}.sorted.bam"
     conda:
         "envs/samtools_bowtie.yaml"
     log:
@@ -201,9 +204,9 @@ rule sort:
 
 rule index:
     input:
-        map_sorted = WORKING_DIR + "sort/{samples}_map.sorted.bam"
+        map_sorted = WORKING_DIR + "sort/{samples}.sorted.bam"
     output:
-        map_sorted_indexed = WORKING_DIR + "index/{samples}_map.sorted.bam.bai"
+        map_sorted_indexed = WORKING_DIR + "index/{samples}.sorted.bam.bai"
     conda:
         "envs/samtools_bowtie.yaml"
     log:
@@ -229,13 +232,12 @@ rule get_genome_info:
 rule peak_calling:
     input:
         map_sorted = WORKING_DIR + "sort/{samples}.sorted.bam",
-        map_sorted_indexed = WORKING_DIR + "index/{samples}_map.sorted.bam.bai"
+        map_sorted_indexed = WORKING_DIR + "index/{samples}.sorted.bam.bai"
     output:
-        gapped_peak = RESULT_DIR + "peaks/{samples}_peaks.gappedPeak"
+        gapped_peak = RESULT_DIR + "peaks/{samples}_peaks.gappedPeak",
+        Name_log = RESULT_DIR + "peaks/{samples}.log"
     params:
         genome_info = str(config['hmmratac']['genome.info']),
-        upper = 20,
-        lower = 10,
         output_preflix = "{samples}"
     log:
         RESULT_DIR + "logs/peak_calling/{samples}.log"
@@ -243,5 +245,5 @@ rule peak_calling:
         "envs/hmmratac.yaml"
     shell:
         """
-        HMMRATAC -b {input.map_sorted} -i {input.map_sorted_indexed} -g {params.genome_info} --output {params.output_preflix} --upper {params.upper} --lower {params.lower} 2&>{log}
+        HMMRATAC -b {input.map_sorted} -i {input.map_sorted_indexed} -g {params.genome_info} -o {params.output_preflix}
         """
