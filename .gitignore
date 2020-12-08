@@ -1,5 +1,5 @@
 .DS_Store
-ATAC-seq_pipeline/temp/*
 ATAC-seq_pipeline/.snakemake/*
-ATAC-seq_pipeline/results/logs/*
-ATAC-seq_pipeline/results/fastqc/*
+ATAC-seq_pipeline/temp/*
+ATAC-seq_pipeline/results/*
+data/.DS_Store
