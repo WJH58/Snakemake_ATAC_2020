@@ -39,3 +39,9 @@ bowtie2:
 # genome.info
 hmmratac:
   genome.info: "genome.info"
+
+# macs2
+macs2:
+  genomesize: "--gsize mm"
+  format: "--format BAMPE"
+  outdir: "results/macs2"
