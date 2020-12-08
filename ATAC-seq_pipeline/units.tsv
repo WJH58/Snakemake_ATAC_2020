@@ -1,5 +1,12 @@
 sample	fq1	fq2
+<<<<<<< HEAD
 WT1	../data/sample_4_1_R1.fastq.gz	../data/sample_4_1_R2.fastq.gz
 WT2	../data/sample_8_R1.fastq.gz	../data/sample_8_R2.fastq.gz
 KO1	../data/sample_4_3_R1.fastq.gz	../data/sample_4_3_R2.fastq.gz
 KO2	../data/sample_12_R1.fastq.gz	../data/sample_12_R2.fastq.gz
+=======
+WT1 ../data/sample_4_1_R1.fastq.gz  ../data/sample_4_1_R2.fastq.gz
+WT2 ../data/sample_8_R1.fastq.gz  ../data/sample_8_R2.fastq.gz
+KO1 ../data/sample_4_3_R1.fastq.gz  ../data/sample_4_3_R2.fastq.gz
+KO2 ../data/sample_12_R1.fastq.gz ../data/sample_12_R2.fastq.gz
+>>>>>>> 1c1bf7f06a984d910b0c13563e5037503a83b9f6

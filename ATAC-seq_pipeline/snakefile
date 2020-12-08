@@ -43,7 +43,7 @@ wildcard_constraints:
 
 ################## DESIRED OUTPUT ##################
 
-FASTQC          = expand(RESULT_DIR + "fastqc/{samples}_{R}_fastqc.html", samples = SAMPLES, R=['R1', 'R2']),
+FASTQC          = expand(RESULT_DIR + "fastqc/sample_{numbers}_{R}_fastqc.html",numbers = ['8','12','4_3','4_1'], R=['R1', 'R2']),
 FORWARD_READS   = expand(WORKING_DIR + "trimmed/{samples}_forward.fastq.gz", samples = SAMPLES),
 REVERSE_READS   = expand(WORKING_DIR + "trimmed/{samples}_reverse.fastq.gz", samples = SAMPLES),
 TRIMMED_FASTQC  = expand(RESULT_DIR + "trimmed_fastqc/{samples}_{direction}_fastqc.html", samples = SAMPLES, direction=['forward', 'reverse']),
@@ -53,7 +53,8 @@ MAP_SORTED = expand(WORKING_DIR + "sort/{samples}.sorted.bam", samples = SAMPLES
 SORTED_INDEXED = expand(WORKING_DIR + "index/{samples}.sorted.bam.bai", samples = SAMPLES),
 GENOME_INFO = expand(WORKING_DIR + "genome_info/{samples}.genome.info", samples  = SAMPLES),
 GAPPED_PEAK = expand(RESULT_DIR + "peaks/{samples}_peaks.gappedPeak", samples = SAMPLES),
-NAME_LOG = expand(RESULT_DIR + "peaks/{samples}.log", samples = SAMPLES)
+NAME_LOG = expand(RESULT_DIR + "peaks/{samples}.log", samples = SAMPLES),
+NARROWPEAK = expand(RESULT_DIR + "macs3/{samples}_peaks.narrowPeak", samples = SAMPLES)
 
 rule all:
     input:
@@ -69,6 +70,7 @@ rule all:
         UNMAPPED,
         MAP_SORTED,
         SORTED_INDEXED,
+        NARROWPEAK,
         #GENOME_INFO,
         #GAPPED_PEAK,
         #NAME_LOG
@@ -106,7 +108,7 @@ rule trimmomatic:
         forward_reads   = WORKING_DIR + "trimmed/{samples}_forward.fastq.gz",
         reverse_reads   = WORKING_DIR + "trimmed/{samples}_reverse.fastq.gz",
         forwardUnpaired = temp(WORKING_DIR + "trimmed/{samples}_forward_unpaired.fastq.gz"),
-        reverseUnpaired = temp(WORKING_DIR + "trimmed/{samples}_reverse_unpaired.fastq.gz"),
+        reverseUnpaired = temp(WORKING_DIR + "trimmed/{samples}_reverse_unpaired.fastq.gz")
     log:
         RESULT_DIR + "logs/trimmomatic/{samples}.log"
     params:
@@ -156,7 +158,7 @@ rule fastqc:
         fwd = expand(DATA_DIR + "sample_{numbers}_R1.fastq.gz", numbers = ['8','12','4_3','4_1']),
         rev = expand(DATA_DIR + "sample_{numbers}_R2.fastq.gz", numbers = ['8','12','4_3','4_1'])
     output:
-        expand(RESULT_DIR + "fastqc/{samples}_{R}_fastqc.html", samples = SAMPLES, R=['R1', 'R2'])
+        expand(RESULT_DIR + "fastqc/sample_{numbers}_{R}_fastqc.html", numbers = ['8','12','4_3','4_1'], R=['R1', 'R2'])
     log:
         expand(RESULT_DIR + "logs/fastqc/{samples}.fastqc.log", samples = SAMPLES)
     params:
@@ -187,7 +189,7 @@ rule mapping:
         RESULT_DIR + "logs/bowtie/{samples}.log"
     shell:
         """
-        bowtie2 {params.bowtie} --threads {threads} -x {params.index} -1 {input.forward_reads} -2 {input.reverse_reads} -U {input.forwardUnpaired},{input.reverseUnpaired} --un-conc-gz {params.unmapped} | samtools view -Sb - > {output.mapped} >&{log}
+        bowtie2 {params.bowtie} --threads {threads} -x {params.index} -1 {input.forward_reads} -2 {input.reverse_reads} -U {input.forwardUnpaired},{input.reverseUnpaired} --un-conc-gz {params.unmapped} | samtools view -Sb - > {output.mapped} 2>{log}
         """
 
 rule sort:
@@ -206,7 +208,7 @@ rule index:
     input:
         map_sorted = WORKING_DIR + "sort/{samples}.sorted.bam"
     output:
-        map_sorted_indexed = WORKING_DIR + "index/{samples}.sorted.bam.bai"
+        map_sorted_indexed = WORKING_DIR + "sort/{samples}.sorted.bam.bai"
     conda:
         "envs/samtools_bowtie.yaml"
     log:
@@ -247,3 +249,24 @@ rule peak_calling:
         """
         HMMRATAC -b {input.map_sorted} -i {input.map_sorted_indexed} -g {params.genome_info} -o {params.output_preflix}
         """
+
+rule call_narrow_peaks:
+    input:
+        map_sorted = WORKING_DIR + "sort/{samples}.sorted.bam"
+    output:
+        narrowPeak = RESULT_DIR + "macs3/{samples}_peaks.narrowPeak"
+    params:
+        name = "{samples}",
+        format = str(config['macs2']['format']),
+        genomesize = str(config['macs2']['genomesize']),
+        outdir = str(config['macs2']['outdir'])
+    log:
+        RESULT_DIR + "logs/macs3/{samples}_peaks.narrowPeak.log"
+    conda:
+        "envs/macs2.yaml"
+    shell:
+        """
+        macs3 callpeak -t {input} {params.format} {params.genomesize} --name {params.name} --nomodel --bdg -q 0.05 --outdir {params.outdir}/ 2>{log}
+        """
+#bdg: create bedgraph output files
+#format=BAMPE: only use properly-paired read alignments
