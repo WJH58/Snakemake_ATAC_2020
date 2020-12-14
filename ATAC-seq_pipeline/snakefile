@@ -50,11 +50,16 @@ TRIMMED_FASTQC  = expand(RESULT_DIR + "trimmed_fastqc/{samples}_{direction}_fast
 MAPPED = expand(WORKING_DIR + "mapped/{samples}.bam", samples = SAMPLES),
 UNMAPPED = expand([WORKING_DIR + "unmapped/{samples}.fq." + str(i) +".gz" for i in range(1,2)], samples = SAMPLES),
 MAP_SORTED = expand(WORKING_DIR + "sort/{samples}.sorted.bam", samples = SAMPLES),
+DEDUP = expand(WORKING_DIR + "dedup/{samples}.dedup.bam", samples = SAMPLES),
+STATS = expand(WORKING_DIR + "dedup/{samples}.dedup.stats", samples = SAMPLES),
 SORTED_INDEXED = expand(WORKING_DIR + "index/{samples}.sorted.bam.bai", samples = SAMPLES),
 GENOME_INFO = expand(WORKING_DIR + "genome_info/{samples}.genome.info", samples  = SAMPLES),
 GAPPED_PEAK = expand(RESULT_DIR + "peaks/{samples}_peaks.gappedPeak", samples = SAMPLES),
 NAME_LOG = expand(RESULT_DIR + "peaks/{samples}.log", samples = SAMPLES),
-NARROWPEAK = expand(RESULT_DIR + "macs2/{samples}_peaks.narrowPeak", samples = SAMPLES)
+NARROWPEAK = expand(RESULT_DIR + "macs2/{samples}_peaks.narrowPeak", samples = SAMPLES),
+COVERAGE_TRACK = expand(WORKING_DIR + "bamCoverage/{samples}.bw", samples = SAMPLES),
+BIGWIGSUMMARY = expand(WORKING_DIR + "bigwigsummary/{samples}.npz", samples = SAMPLES),
+PCAPLOT = expand(RESULT_DIR + "PCA/{samples}_pca.png", samples = SAMPLES)
 
 rule all:
     input:
@@ -69,8 +74,13 @@ rule all:
         MAPPED,
         UNMAPPED,
         MAP_SORTED,
-        SORTED_INDEXED,
-        NARROWPEAK,
+        DEDUP,
+        STATS,
+        COVERAGE_TRACK,
+        BIGWIGSUMMARY,
+        PCAPLOT,
+        #SORTED_INDEXED,
+        #NARROWPEAK,
         #GENOME_INFO,
         #GAPPED_PEAK,
         #NAME_LOG
@@ -204,6 +214,21 @@ rule sort:
     shell:
         "samtools sort {input} -o {output} &>{log}"
 
+rule deduplication:
+    input:
+        map_sorted = WORKING_DIR + "sort/{samples}.sorted.bam"
+    output:
+        dedup = WORKING_DIR + "dedup/{samples}.dedup.bam",
+        stats = WORKING_DIR + "dedup/{samples}.dedup.stats"
+    conda:
+        "envs/picard.yaml"
+    log:
+        RESULT_DIR + "logs/dedup/{samples}.log"
+    shell:
+        """
+        picard MarkDuplicates -I {input} -O {output.dedup} -M {output.stats} 2>{log}
+        """
+
 rule index:
     input:
         map_sorted = WORKING_DIR + "sort/{samples}.sorted.bam"
@@ -268,5 +293,44 @@ rule call_narrow_peaks:
         """
         macs2 callpeak -t {input} {params.format} {params.genomesize} --name {params.name} --nomodel --bdg -q 0.05 --outdir {params.outdir}/ 2>{log}
         """
+
+rule bamCoverage:
+    input:
+        map_sorted = WORKING_DIR + "sort/{samples}.sorted.bam"
+    output:
+        coverage_track = WORKING_DIR + "bamCoverage/{samples}.bw"
+    params:
+        effectiveGenomeSize = str(config['bamCoverage']['effectiveGenomeSize']),
+        normalization = str(config['bamCoverage']['normalization'])
+    log:
+        RESULT_DIR + "logs/bamCoverage/{samples}.bw.log"
+    conda:
+        "envs/deeptools.yaml"
+    shell:
+        "bamCoverage -b {input} --effectiveGenomeSize {params.effectiveGenomeSize} --normalizeUsing {params.normalization} --ignoreDuplicates -o {output}"
 #bdg: create bedgraph output files
 #format=BAMPE: only use properly-paired read alignments
+
+rule multibigwigSummary:
+    input:
+        coverage_track = WORKING_DIR + "bamCoverage/{samples}.bw"
+    output:
+        bigwigsummary = WORKING_DIR + "bigwigsummary/{samples}.npz"
+    log:
+        RESULT_DIR + "logs/bigwigsummary/{samples}.bw.log"
+    conda:
+        "envs/deeptools.yaml"
+    shell:
+        "multiBigwigSummary bins -b {input} -o {output}"
+
+rule PCA:
+    input:
+        bigwigsummary = WORKING_DIR + "bigwigsummary/{samples}.npz"
+    output:
+        PCAplot = RESULT_DIR + "PCA/{samples}_pca.png"
+    log:
+        RESULT_DIR + "logs/bigwigsummary/{samples}_pca.png.log"
+    conda:
+        "envs/deeptools.yaml"
+    shell:
+        "plotPCA -in {input} -o {output}"

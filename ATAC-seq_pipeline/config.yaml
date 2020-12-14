@@ -45,3 +45,8 @@ macs2:
   genomesize: "--gsize mm"
   format: "--format BAMPE"
   outdir: "results/macs2"
+
+# bamCoverage
+bamCoverage:
+  effectiveGenomeSize: "2652783500"
+  normalization: "RPKM"
