@@ -52,3 +52,7 @@ bamCoverage:
   effectiveGenomeSize: "2652783500"
   normalization: "RPKM"
   binSize: "1000"
+
+# computeMatrix
+ComputeMatrix:
+  GTF: "gencode.vM25.annotation.gtf"  

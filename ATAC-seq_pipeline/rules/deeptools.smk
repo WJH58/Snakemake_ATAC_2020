@@ -61,3 +61,26 @@ rule PCA:
         -o {output} \
         2>{log}
         """
+rule ComputeMatrix:
+    input:
+        lambda wildcards: expand(RESULT_DIR + "bamCoverage/{sample}.bw", sample = SAMPLES)
+    output:
+        RESULT_DIR + "computematrix/ComputeMatrix.gz"
+    log:
+        RESULT_DIR + "logs/computematrix/matrix.log"
+    conda:
+        "envs/deeptools.yaml"
+    params:
+        GTF = str(config['ComputeMatrix']['GTF'])
+    shell:
+        "computeMatrix reference-point -S {input} -R {params.GTF} -o {output} -a 3000 -b 3000 2>{log}"
+
+rule plotHeatmap:
+    input:
+        RESULT_DIR + "computematrix/ComputeMatrix.gz"
+    output:
+        RESULT_DIR + "heatmap/heatmap_reference_point_genes.pdf"
+    conda:
+        "envs/deeptools.yaml"
+    shell:
+        "plotHeatmap -m {input} -o {output}"

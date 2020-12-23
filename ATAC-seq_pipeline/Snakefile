@@ -64,14 +64,14 @@ NARROWPEAK          =       expand(RESULT_DIR     + "macs2/{samples}_peaks.narro
 COVERAGE_TRACK      =       expand(RESULT_DIR     + "bamCoverage/{samples}.bw", samples = SAMPLES),
 BIGWIGSUMMARY       =        RESULT_DIR     + "bigwigsummary/multiBigwigSummary.npz",
 PCAPLOT             =        RESULT_DIR     + "PCA/PCA_PLOT.pdf"
+HEATMAP             =       RESULT_DIR + "heatmap/heatmap_reference_point_genes.pdf"
+
+
+container: "docker://continuumio/miniconda3:4.4.10"
 
 rule all:
     input:
         FASTQC,
-        WORKING_DIR + "reference",
-        [WORKING_DIR + "genome." + str(i) + ".bt2" for i in range(1,4)],
-        WORKING_DIR + "genome.rev.1.bt2",
-        WORKING_DIR + "genome.rev.2.bt2",
         FORWARD_READS,
         REVERSE_READS,
         TRIMMED_FASTQC,
@@ -85,13 +85,17 @@ rule all:
         #PCAPLOT,
         #SORTED_INDEXED,
         #NARROWPEAK,
-        HMMRATAC,
+        #HMMRATAC,
+        HEATMAP
 
     message : "Analysis is complete!"
+    log:
+        "log/rule_all.log"
     shell:""
 
 ################## INCLUDE RULES ##################
 include: "rules/external_data.smk"
 include: "rules/pre-processing.smk"
 include: "rules/macs2.smk"
+include: "rules/deeptools.smk"
 include: "rules/hmmratac.smk"
