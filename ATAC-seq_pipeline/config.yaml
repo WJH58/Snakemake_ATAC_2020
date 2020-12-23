@@ -11,7 +11,7 @@ units : "units.tsv"
 ## genome reference ##
 
 genome_fasta_url : "ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M17/GRCm38.primary_assembly.genome.fa.gz"
-
+HMMRATAC: "https://github.com/LiuLabUB/HMMRATAC/releases/download/1.2.10/HMMRATAC_V1.2.10_exe.jar"
 
 
 ## trimmomatic ##

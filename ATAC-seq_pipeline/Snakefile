@@ -45,6 +45,7 @@ wildcard_constraints:
 # Here we define the outputs of rules we want the pipeline to produce.
 # The varialble defined here is then used in the `rule all`.
 # Fastqc rule need to be modified to accept any sample
+# HMMRATAC will not work with the test dataset.
 
 FASTQC              =       expand(RESULT_DIR     + "fastqc/sample_{numbers}_{R}_fastqc.html",numbers = ['8','12','4_3','4_1'], R=['R1', 'R2']),
 FORWARD_READS       =       expand(WORKING_DIR    + "trimmed/{samples}_forward.fastq.gz", samples = SAMPLES),
@@ -57,7 +58,7 @@ DEDUP               =       expand(WORKING_DIR    + "dedup/{samples}.dedup.bam",
 STATS               =       expand(WORKING_DIR    + "dedup/{samples}.dedup.stats", samples = SAMPLES),
 SORTED_INDEXED      =       expand(WORKING_DIR    + "sort/{samples}.sorted.bam.bai", samples = SAMPLES),
 GENOME_INFO         =       expand(WORKING_DIR    + "genome_info/{samples}.genome.info", samples  = SAMPLES),
-GAPPED_PEAK         =       expand(RESULT_DIR     + "peaks/{samples}_peaks.gappedPeak", samples = SAMPLES),
+HMMRATAC            =       expand(RESULT_DIR     + "hmmratac/{samples}_peaks.gappedPeak", samples = SAMPLES),
 NAME_LOG            =       expand(RESULT_DIR     + "peaks/{samples}.log", samples = SAMPLES),
 NARROWPEAK          =       expand(RESULT_DIR     + "macs2/{samples}_peaks.narrowPeak", samples = SAMPLES),
 COVERAGE_TRACK      =       expand(RESULT_DIR     + "bamCoverage/{samples}.bw", samples = SAMPLES),
@@ -84,9 +85,7 @@ rule all:
         #PCAPLOT,
         #SORTED_INDEXED,
         #NARROWPEAK,
-        #GENOME_INFO,
-        #GAPPED_PEAK,
-        #NAME_LOG
+        HMMRATAC,
 
     message : "Analysis is complete!"
     shell:""
@@ -95,3 +94,4 @@ rule all:
 include: "rules/external_data.smk"
 include: "rules/pre-processing.smk"
 include: "rules/macs2.smk"
+include: "rules/hmmratac.smk"

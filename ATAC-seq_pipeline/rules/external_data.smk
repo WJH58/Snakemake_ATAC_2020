@@ -1,3 +1,7 @@
+#########################
+#Sets of rules for trimming, mapping, sorting and indexing of ATAC-seq reads.
+#########################
+
 rule download_genome:
     output:
         WORKING_DIR + "reference",

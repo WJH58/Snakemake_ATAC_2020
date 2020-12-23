@@ -1,3 +1,8 @@
+#########################
+#Sets of rules for trimming, mapping, sorting and indexing of ATAC-seq reads. 
+#########################
+
+
 rule trimmomatic:
     input:
         reads = get_fastq,
