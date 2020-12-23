@@ -47,6 +47,8 @@ macs2:
   outdir: "results/macs2"
 
 # bamCoverage
+# binSize parameters is set to 1000bp to test quickly the pipeline. Change to a lower value with real samples.
 bamCoverage:
   effectiveGenomeSize: "2652783500"
   normalization: "RPKM"
+  binSize: "1000"
