@@ -69,7 +69,7 @@ rule ComputeMatrix:
     log:
         RESULT_DIR + "logs/computematrix/matrix.log"
     conda:
-        "envs/deeptools.yaml"
+        "../envs/deeptools.yaml"
     params:
         GTF = WORKING_DIR + "gtf_gene.gtf"
     shell:
@@ -81,6 +81,6 @@ rule plotHeatmap:
     output:
         RESULT_DIR + "heatmap/heatmap_reference_point_genes.pdf"
     conda:
-        "envs/deeptools.yaml"
+        "../envs/deeptools.yaml"
     shell:
         "plotHeatmap -m {input} -o {output}"
