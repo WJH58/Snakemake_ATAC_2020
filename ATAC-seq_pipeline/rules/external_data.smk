@@ -9,6 +9,12 @@ rule download_genome:
         "wget -O {output} {GENOME_FASTA_URL}"
 
 
+rule download_gene_gtf:
+    output:
+        WORKING_DIR + "gtf_gene.gtf"
+    shell:
+        "curl {GENE_GTF_URL} | gunzip -c > {output}"
+
 rule index_genome:
     input:
         WORKING_DIR + "reference",

@@ -16,6 +16,7 @@ WORKING_DIR         = config["working_dir"]
 RESULT_DIR          = config["results_dir"]
 DATA_DIR            = config["data_dir"]
 GENOME_FASTA_URL    = config["genome_fasta_url"]
+GENE_GTF_URL        = config["gene_gtf_url"]
 
 #units = pd.read_table(config["units"], dtype=str).set_index(["bed"], drop=False)
 

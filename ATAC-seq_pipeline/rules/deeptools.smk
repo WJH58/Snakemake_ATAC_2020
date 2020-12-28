@@ -71,7 +71,7 @@ rule ComputeMatrix:
     conda:
         "envs/deeptools.yaml"
     params:
-        GTF = str(config['ComputeMatrix']['GTF'])
+        GTF = WORKING_DIR + "gtf_gene.gtf"
     shell:
         "computeMatrix reference-point -S {input} -R {params.GTF} -o {output} -a 3000 -b 3000 2>{log}"
 
