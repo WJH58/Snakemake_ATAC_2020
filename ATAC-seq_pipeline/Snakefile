@@ -67,12 +67,13 @@ COVERAGE_TRACK      =       expand(RESULT_DIR     + "bamCoverage/{samples}.bw", 
 BIGWIGSUMMARY       =        RESULT_DIR     + "bigwigsummary/multiBigwigSummary.npz",
 PCAPLOT             =        RESULT_DIR     + "PCA/PCA_PLOT.pdf"
 HEATMAP             =       RESULT_DIR + "heatmap/heatmap_reference_point_genes.pdf"
-
+GFT                 =       WORKING_DIR + "gtf_gene.gtf"
 
 container: "docker://continuumio/miniconda3:4.4.10"
 
 rule all:
     input:
+        GFT,
         FASTQC,
         FORWARD_READS,
         REVERSE_READS,
