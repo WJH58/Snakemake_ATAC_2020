@@ -15,6 +15,8 @@ rule bamCoverage:
         RESULT_DIR + "logs/bamCoverage/{samples}.bw.log"
     conda:
         "../envs/deeptools.yaml"
+    message:
+        "Converting {wildcards.samples} into bigwig files."
     shell:
         """
         bamCoverage -b {input} \
@@ -39,6 +41,8 @@ rule multibigwigSummary:
         RESULT_DIR + "logs/bigwigsummary/multiBigwigSummary.log"
     conda:
         "../envs/deeptools.yaml"
+    message:
+        "Computing the read coverage into a numpy array."
     shell:
         """
         multiBigwigSummary bins -b {input} \
@@ -55,12 +59,15 @@ rule PCA:
         RESULT_DIR + "logs/bigwigsummary/PCA_PLOT.log"
     conda:
         "../envs/deeptools.yaml"
+    message:
+        "Plotting PCA"
     shell:
         """
         plotPCA -in {input} \
         -o {output} \
         2>{log}
         """
+
 rule ComputeMatrix:
     input:
         lambda wildcards: expand(RESULT_DIR + "bamCoverage/{sample}.bw", sample = SAMPLES)
@@ -70,10 +77,12 @@ rule ComputeMatrix:
         RESULT_DIR + "logs/computematrix/matrix.log"
     conda:
         "../envs/deeptools.yaml"
+    message:
+        "Computing matrix for samples with 10bp windows and 3000bp around TSS."
     params:
         GTF = WORKING_DIR + "gtf_gene.gtf"
     shell:
-        "computeMatrix reference-point -S {input} -R {params.GTF} -o {output} -a 3000 -b 3000 2>{log}"
+        "computeMatrix reference-point -S {input} -R {params.GTF} -o {output} -a 3000 -b 3000 --binSize 2>{log}"
 
 rule plotHeatmap:
     input:
@@ -82,5 +91,7 @@ rule plotHeatmap:
         RESULT_DIR + "heatmap/heatmap_reference_point_genes.pdf"
     conda:
         "../envs/deeptools.yaml"
+    message:
+        "Plotting heatmap."
     shell:
         "plotHeatmap -m {input} -o {output}"
