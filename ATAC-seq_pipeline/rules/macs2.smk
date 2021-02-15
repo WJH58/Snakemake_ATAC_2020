@@ -16,6 +16,8 @@ rule call_narrow_peaks:
         RESULT_DIR + "logs/macs2/{samples}_peaks.narrowPeak.log"
     conda:
         "../envs/macs2.yaml"
+    message:
+        "Calling peaks for {wildcards.samples}"
     shell:
         """
         macs2 callpeak -t {input} {params.format} {params.genomesize} \

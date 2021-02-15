@@ -1,5 +1,5 @@
 #########################
-#Sets of rules for trimming, mapping, sorting and indexing of ATAC-seq reads. 
+#Sets of rules for trimming, mapping, sorting and indexing of ATAC-seq reads.
 #########################
 
 
@@ -27,6 +27,8 @@ rule trimmomatic:
     threads: 10
     conda:
         "../envs/trimmomatic.yaml"
+    message:
+        "Trimming reads for {wildcards.samples}"
     shell:
         """
         trimmomatic PE \
@@ -51,6 +53,8 @@ rule trimmed_fastqc:
         RESULT_DIR + "trimmed_fastqc/"
     conda:
         "../envs/fastqc.yaml"
+    message:
+        "Quality check after trimming for {wildcards.samples}"
     log:
         RESULT_DIR + "logs/trimmed_fastqc/{samples}_{direction}.fastqc.log"
     shell:
@@ -68,6 +72,8 @@ rule fastqc:
         RESULT_DIR + "fastqc/"
     conda:
         "../envs/fastqc.yaml"
+    message:
+        "Quality check for {wildcards.samples}"
     shell:
         "fastqc --outdir={params} {input.fwd} {input.rev} &>{log}"
 
@@ -88,6 +94,8 @@ rule mapping:
     threads: 10
     conda:
         "../envs/samtools_bowtie.yaml"
+    message:
+        "Mapping {wildcards.samples} to reference genome."
     log:
         RESULT_DIR + "logs/bowtie/{samples}.log"
     shell:
@@ -107,6 +115,8 @@ rule sort:
         bai     = WORKING_DIR + "sort/{samples}.sorted.bam.bai"
     conda:
         "../envs/samtools_bowtie.yaml"
+    message:
+        "Sorting {wildcards.samples} bam file."
     log:
         RESULT_DIR + "logs/sort/{samples}.log"
     shell:
@@ -123,6 +133,8 @@ rule deduplication:
         stats = WORKING_DIR + "dedup/{samples}.dedup.stats"
     conda:
         "../envs/picard.yaml"
+    message:
+        "Removing duplicates for {wildcards.samples} sorted bam file."
     log:
         RESULT_DIR + "logs/dedup/{samples}.log"
     shell:
