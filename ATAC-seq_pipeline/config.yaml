@@ -57,3 +57,30 @@ bamCoverage:
 # computeMatrix
 ComputeMatrix:
   GTF: "gencode.vM25.annotation.gtf"
+  binSize: "10"
+  afterRegionStartLength: "3000"
+  beforeRegionStartLength: "3000"
+  referencePoint: "TSS"
+  numberOfProcessors: "10"
+
+# plotHeatmap
+plotHeatmap:
+  dpi: "100"
+  yMin: "0"
+  yMax: "50"
+  refPointLabel: "TSS"
+  colorList: "white, blue"
+
+# plotProfile
+plotProfile:
+  dpi: "100"
+  colors: "red blue"
+
+# plotCorrelation
+plotCorrelation:
+  corMethod: "pearson"
+  whatToPlot: "heatmap"
+
+# bamPEFragmentSize
+  binSize: "1000"
+  numberOfProcessors: "10"

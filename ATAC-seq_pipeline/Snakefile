@@ -49,6 +49,7 @@ wildcard_constraints:
 # Fastqc rule need to be modified to accept any sample
 # HMMRATAC will not work with the test dataset.
 
+GFT                 =       WORKING_DIR           + "gtf_gene.gtf"
 FASTQC              =       expand(RESULT_DIR     + "fastqc/sample_{numbers}_{R}_fastqc.html",numbers = ['8','12','4_3','4_1'], R=['R1', 'R2']),
 FORWARD_READS       =       expand(WORKING_DIR    + "trimmed/{samples}_forward.fastq.gz", samples = SAMPLES),
 REVERSE_READS       =       expand(WORKING_DIR    + "trimmed/{samples}_reverse.fastq.gz", samples = SAMPLES),
@@ -64,10 +65,12 @@ HMMRATAC            =       expand(RESULT_DIR     + "hmmratac/{samples}_peaks.ga
 NAME_LOG            =       expand(RESULT_DIR     + "peaks/{samples}.log", samples = SAMPLES),
 NARROWPEAK          =       expand(RESULT_DIR     + "macs2/{samples}_peaks.narrowPeak", samples = SAMPLES),
 COVERAGE_TRACK      =       expand(RESULT_DIR     + "bamCoverage/{samples}.bw", samples = SAMPLES),
-BIGWIGSUMMARY       =        RESULT_DIR     + "bigwigsummary/multiBigwigSummary.npz",
-PCAPLOT             =        RESULT_DIR     + "PCA/PCA_PLOT.pdf"
-HEATMAP             =       RESULT_DIR + "heatmap/heatmap_reference_point_genes.pdf"
-GFT                 =       WORKING_DIR + "gtf_gene.gtf"
+BIGWIGSUMMARY       =       RESULT_DIR            + "bigwigsummary/multiBigwigSummary.npz",
+PCAPLOT             =       RESULT_DIR            + "PCA/PCA_PLOT.pdf"
+MATRIX              =       RESULT_DIR            + "computematrix/ComputeMatrix.gz"
+HEATMAP             =       RESULT_DIR            + "heatmap/heatmap_reference_point_genes.pdf"
+CORRELATION         =       RESULT_DIR            + "correlation/correlation.pdf"
+HISTOGRAM           =       RESULT_DIR + "bamPEFragmentSize/histogram.png"
 
 container: "docker://continuumio/miniconda3:4.4.10"
 
@@ -83,13 +86,17 @@ rule all:
         MAP_SORTED,
         #DEDUP,
         #STATS,
-        #COVERAGE_TRACK,
-        #BIGWIGSUMMARY,
-        #PCAPLOT,
-        #SORTED_INDEXED,
+        COVERAGE_TRACK,
+        BIGWIGSUMMARY,
+        PCAPLOT,
+        SORTED_INDEXED,
         #NARROWPEAK,
         #HMMRATAC,
-        HEATMAP
+        MATRIX,
+        HEATMAP,
+        CORRELATION,
+        HISTOGRAM
+        
 
     message : "Analysis is complete!"
     log:
