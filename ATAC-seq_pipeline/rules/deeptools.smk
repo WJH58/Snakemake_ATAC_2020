@@ -13,17 +13,17 @@ rule bamPEFragmentSize:
     log:
         RESULT_DIR + "logs/bamPEFragmentSize/bamPEFragmentSize.log"
     params:
-        numberOfProcessors      = str(config['bamPEFragmentSize']['numberOfProcessors'])
-        binSize                 = str(config['bamPEFragmentSize']['binSize'])
-        plotFileFormat          = str(config['bamPEFragmentSize']['plotFileFormat'])
-        samplesLabel            = str(config['bamPEFragmentSize']['samplesLabel'])
+        numberOfProcessors      = str(config['bamPEFragmentSize']['numberOfProcessors']),
+        binSize                 = str(config['bamPEFragmentSize']['binSize']),
+        plotFileFormat          = str(config['bamPEFragmentSize']['plotFileFormat']),
+        samplesLabel            = str(config['bamPEFragmentSize']['samplesLabel']),
         plotTitle               = str(config['bamPEFragmentSize']['plotTitle'])
     shell:
         """
         bamPEFragmentSize -b {input} \
         -o {output} \
         --numberOfProcessors {params.numberOfProcessors} \
-        --binSize 1000 {params.binSize} \
+        --binSize {params.binSize} \
         --plotFileFormat {params.plotFileFormat} \
         --samplesLabel {params.samplesLabel} \
         -T {params.plotTitle} \
@@ -85,7 +85,7 @@ rule plotCorrelation:
     log:
         RESULT_DIR + "logs/correlation/correlation.log"
     params:
-        corMethod               = str(config['plotCorrelation']['corMethod'])
+        corMethod               = str(config['plotCorrelation']['corMethod']),
         whatToPlot              = str(config['plotCorrelation']['whatToPlot'])
     message:
         "Plotting correlation."
@@ -130,11 +130,11 @@ rule ComputeMatrix:
     message:
         "Computing matrix for samples with {params.binSize} windows and {params.afterRegionStartLength}bp around {params.referencePoint}."
     params:
-        GTF                      = WORKING_DIR + "gtf_gene.gtf"
-        binSize                  = str(config['ComputeMatrix']['binSize'])
-        afterRegionStartLength   = str(config['ComputeMatrix']['afterRegionStartLength'])
-        beforeRegionStartLength  = str(config['ComputeMatrix']['beforeRegionStartLength'])
-        referencePoint           = str(config['ComputeMatrix']['referencePoint'])
+        GTF                      = WORKING_DIR + "gtf_gene.gtf",
+        binSize                  = str(config['ComputeMatrix']['binSize']),
+        afterRegionStartLength   = str(config['ComputeMatrix']['afterRegionStartLength']),
+        beforeRegionStartLength  = str(config['ComputeMatrix']['beforeRegionStartLength']),
+        referencePoint           = str(config['ComputeMatrix']['referencePoint']),
         numberOfProcessors       = str(config['ComputeMatrix']['numberOfProcessors'])
     shell:
         """
@@ -160,10 +160,10 @@ rule plotHeatmap:
     message:
         "Plotting heatmap."
     params:
-        dpi                      = str(config['plotHeatmap']['dpi'])
-        yMin                     = str(config['plotHeatmap']['yMin'])
-        yMax                     = str(config['plotHeatmap']['yMax'])
-        refPointLabel            = str(config['plotHeatmap']['refPointLabel'])
+        dpi                      = str(config['plotHeatmap']['dpi']),
+        yMin                     = str(config['plotHeatmap']['yMin']),
+        yMax                     = str(config['plotHeatmap']['yMax']),
+        refPointLabel            = str(config['plotHeatmap']['refPointLabel']),
         colorList                = str(config['plotHeatmap']['colorList'])
     shell:
         """
@@ -186,7 +186,7 @@ rule plotProfile:
     message:
         "Plotting profile."
     params:
-        dpi                      = str(config['plotProfile']['dpi'])
+        dpi                      = str(config['plotProfile']['dpi']),
         colors                   = str(config['plotProfile']['colors'])
     shell:
         """
