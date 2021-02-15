@@ -84,3 +84,6 @@ plotCorrelation:
 # bamPEFragmentSize
   binSize: "1000"
   numberOfProcessors: "10"
+  plotFileFormat: "pdf"
+  samplesLabel: "sample1 sample2 sample3 sample4"
+  plotTitle: "Fragment size of PE ATAC-seq data"

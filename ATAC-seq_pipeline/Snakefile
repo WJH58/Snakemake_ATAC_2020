@@ -70,7 +70,8 @@ PCAPLOT             =       RESULT_DIR            + "PCA/PCA_PLOT.pdf"
 MATRIX              =       RESULT_DIR            + "computematrix/ComputeMatrix.gz"
 HEATMAP             =       RESULT_DIR            + "heatmap/heatmap_reference_point_genes.pdf"
 CORRELATION         =       RESULT_DIR            + "correlation/correlation.pdf"
-HISTOGRAM           =       RESULT_DIR + "bamPEFragmentSize/histogram.png"
+HISTOGRAM           =       RESULT_DIR            + "bamPEFragmentSize/histogram.png"
+PROFILE             =       RESULT_DIR            + "profile/profile_reference_point_genes.pdf"
 
 container: "docker://continuumio/miniconda3:4.4.10"
 
@@ -95,8 +96,9 @@ rule all:
         MATRIX,
         HEATMAP,
         CORRELATION,
-        HISTOGRAM
-        
+        HISTOGRAM,
+        PROFILE
+
 
     message : "Analysis is complete!"
     log:

@@ -13,7 +13,7 @@ rule download_genome:
 
 rule download_gene_gtf:
     output:
-        WORKING_DIR + "gtf_gene.gtf"
+        gft         =       WORKING_DIR + "gtf_gene.gtf"
     message:
         "Downloading annotation file."
     shell:

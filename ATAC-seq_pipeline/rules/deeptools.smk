@@ -15,15 +15,20 @@ rule bamPEFragmentSize:
     params:
         numberOfProcessors      = str(config['bamPEFragmentSize']['numberOfProcessors'])
         binSize                 = str(config['bamPEFragmentSize']['binSize'])
+        plotFileFormat          = str(config['bamPEFragmentSize']['plotFileFormat'])
+        samplesLabel            = str(config['bamPEFragmentSize']['samplesLabel'])
+        plotTitle               = str(config['bamPEFragmentSize']['plotTitle'])
     shell:
         """
         bamPEFragmentSize -b {input} \
         -o {output} \
         --numberOfProcessors {params.numberOfProcessors} \
         --binSize 1000 {params.binSize} \
-        --table
+        --plotFileFormat {params.plotFileFormat} \
+        --samplesLabel {params.samplesLabel} \
+        -T {params.plotTitle} \
+        --table 2>{log}
         """
-
 
 rule bamCoverage:
     input:
@@ -47,7 +52,7 @@ rule bamCoverage:
         --normalizeUsing {params.normalization} \
         --ignoreDuplicates \
         -o {output} \
-        --binSize {params.binSize}
+        --binSize {params.binSize} 2>{log}
         """
 #bdg: create bedgraph output files
 #format=BAMPE: only use properly-paired read alignments
@@ -77,6 +82,8 @@ rule plotCorrelation:
         bigwigsummary           = RESULT_DIR + "bigwigsummary/multiBigwigSummary.npz"
     output:
         correlation             = RESULT_DIR + "correlation/correlation.pdf"
+    log:
+        RESULT_DIR + "logs/correlation/correlation.log"
     params:
         corMethod               = str(config['plotCorrelation']['corMethod'])
         whatToPlot              = str(config['plotCorrelation']['whatToPlot'])
@@ -85,10 +92,10 @@ rule plotCorrelation:
     shell:
         """
         plotCorrelation --corData {input} \
-        --corMethod {params.corMethod}
-        --whatToPlot {params.whatToPlot}
-        -o {output}
-        --skipZeros
+        --corMethod {params.corMethod} \
+        --whatToPlot {params.whatToPlot} \
+        -o {output} \
+        --skipZeros 2>{log}
         """
 
 # 2>{log}
@@ -135,7 +142,7 @@ rule ComputeMatrix:
         -S {input} -R {params.GTF} -o {output} \
         -a {params.afterRegionStartLength} \
         -b {params.beforeRegionStartLength} \
-        --referencePoint {params.referencePoint}
+        --referencePoint {params.referencePoint} \
         --binSize {params.binSize} \
         --skipZeros \
         2>{log}
