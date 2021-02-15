@@ -82,6 +82,7 @@ plotCorrelation:
   whatToPlot: "heatmap"
 
 # bamPEFragmentSize
+bamPEFragmentSize:
   binSize: "1000"
   numberOfProcessors: "10"
   plotFileFormat: "pdf"
