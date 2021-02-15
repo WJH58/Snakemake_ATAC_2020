@@ -76,7 +76,7 @@ rule plotCorrelation:
     input:
         bigwigsummary           = RESULT_DIR + "bigwigsummary/multiBigwigSummary.npz"
     output:
-        correlation            = RESULT_DIR + "correlation/correlation.pdf"
+        correlation             = RESULT_DIR + "correlation/correlation.pdf"
     params:
         corMethod               = str(config['plotCorrelation']['corMethod'])
         whatToPlot              = str(config['plotCorrelation']['whatToPlot'])
@@ -115,7 +115,7 @@ rule ComputeMatrix:
     input:
         lambda wildcards: expand(RESULT_DIR + "bamCoverage/{sample}.bw", sample = SAMPLES)
     output:
-        RESULT_DIR + "computematrix/ComputeMatrix.gz"
+        matrix                   = RESULT_DIR + "computematrix/ComputeMatrix.gz"
     log:
         RESULT_DIR + "logs/computematrix/matrix.log"
     conda:
@@ -123,12 +123,12 @@ rule ComputeMatrix:
     message:
         "Computing matrix for samples with {params.binSize} windows and {params.afterRegionStartLength}bp around {params.referencePoint}."
     params:
-        GTF                     = WORKING_DIR + "gtf_gene.gtf"
-        binSize                 = str(config['ComputeMatrix']['binSize'])
-        afterRegionStartLength  = str(config['ComputeMatrix']['afterRegionStartLength'])
-        beforeRegionStartLength = str(config['ComputeMatrix']['beforeRegionStartLength'])
-        referencePoint          = str(config['ComputeMatrix']['referencePoint'])
-        numberOfProcessors      = str(config['ComputeMatrix']['numberOfProcessors'])
+        GTF                      = WORKING_DIR + "gtf_gene.gtf"
+        binSize                  = str(config['ComputeMatrix']['binSize'])
+        afterRegionStartLength   = str(config['ComputeMatrix']['afterRegionStartLength'])
+        beforeRegionStartLength  = str(config['ComputeMatrix']['beforeRegionStartLength'])
+        referencePoint           = str(config['ComputeMatrix']['referencePoint'])
+        numberOfProcessors       = str(config['ComputeMatrix']['numberOfProcessors'])
     shell:
         """
         computeMatrix reference-point \
@@ -145,7 +145,7 @@ rule plotHeatmap:
     input:
         RESULT_DIR + "computematrix/ComputeMatrix.gz"
     output:
-        RESULT_DIR + "heatmap/heatmap_reference_point_genes.pdf"
+        heatmap                  = RESULT_DIR + "heatmap/heatmap_reference_point_genes.pdf"
     log:
         RESULT_DIR + "logs/heatmap/heatmap.log"
     conda:
@@ -153,11 +153,11 @@ rule plotHeatmap:
     message:
         "Plotting heatmap."
     params:
-        dpi                     = str(config['plotHeatmap']['dpi'])
-        yMin                    = str(config['plotHeatmap']['yMin'])
-        yMax                    = str(config['plotHeatmap']['yMax'])
-        refPointLabel           = str(config['plotHeatmap']['refPointLabel'])
-        colorList               = str(config['plotHeatmap']['colorList'])
+        dpi                      = str(config['plotHeatmap']['dpi'])
+        yMin                     = str(config['plotHeatmap']['yMin'])
+        yMax                     = str(config['plotHeatmap']['yMax'])
+        refPointLabel            = str(config['plotHeatmap']['refPointLabel'])
+        colorList                = str(config['plotHeatmap']['colorList'])
     shell:
         """
         plotHeatmap -m {input} -o {output} \
@@ -171,7 +171,7 @@ rule plotProfile:
     input:
         RESULT_DIR + "computematrix/ComputeMatrix.gz"
     output:
-        RESULT_DIR + "profile/profile_reference_point_genes.pdf"
+        profile                  = RESULT_DIR + "profile/profile_reference_point_genes.pdf"
     log:
         RESULT_DIR + "logs/profile/profile.log"
     conda:
@@ -179,8 +179,8 @@ rule plotProfile:
     message:
         "Plotting profile."
     params:
-        dpi                     = str(config['plotProfile']['dpi'])
-        colors                  = str(config['plotProfile']['colors'])
+        dpi                      = str(config['plotProfile']['dpi'])
+        colors                   = str(config['plotProfile']['colors'])
     shell:
         """
         plotProfile -m {input} \
