@@ -1,6 +1,29 @@
 #########################
 #Sets of rules for deeptools postprocessing. All parameters can be modified in the configuration file.
 #########################
+rule bamPEFragmentSize:
+    input:
+        lambda wildcards: expand(WORKING_DIR + "mapped/{sample}.bam", sample = SAMPLES)
+    output:
+        histogram               = RESULT_DIR + "bamPEFragmentSize/histogram.png"
+    conda:
+        "../envs/deeptools.yaml"
+    message:
+        "Calculating fragment sizes for read pairs."
+    log:
+        RESULT_DIR + "logs/bamPEFragmentSize/bamPEFragmentSize.log"
+    params:
+        numberOfProcessors      = str(config['bamPEFragmentSize']['numberOfProcessors'])
+        binSize                 = str(config['bamPEFragmentSize']['binSize'])
+    shell:
+        """
+        bamPEFragmentSize -b {input} \
+        -o {output} \
+        --numberOfProcessors {params.numberOfProcessors} \
+        --binSize 1000 {params.binSize} \
+        --table
+        """
+
 
 rule bamCoverage:
     input:
@@ -48,7 +71,27 @@ rule multibigwigSummary:
         multiBigwigSummary bins -b {input} \
         -o {output}
         """
-#2>{log}
+
+rule plotCorrelation:
+    input:
+        bigwigsummary           = RESULT_DIR + "bigwigsummary/multiBigwigSummary.npz"
+    output:
+        correlation            = RESULT_DIR + "correlation/correlation.pdf"
+    params:
+        corMethod               = str(config['plotCorrelation']['corMethod'])
+        whatToPlot              = str(config['plotCorrelation']['whatToPlot'])
+    message:
+        "Plotting correlation."
+    shell:
+        """
+        plotCorrelation --corData {input} \
+        --corMethod {params.corMethod}
+        --whatToPlot {params.whatToPlot}
+        -o {output}
+        --skipZeros
+        """
+
+# 2>{log}
 # PlotPCA does not work with a bigwigsummary made of only one sample
 rule PCA:
     input:
@@ -78,20 +121,71 @@ rule ComputeMatrix:
     conda:
         "../envs/deeptools.yaml"
     message:
-        "Computing matrix for samples with 10bp windows and 3000bp around TSS."
+        "Computing matrix for samples with {params.binSize} windows and {params.afterRegionStartLength}bp around {params.referencePoint}."
     params:
-        GTF = WORKING_DIR + "gtf_gene.gtf"
+        GTF                     = WORKING_DIR + "gtf_gene.gtf"
+        binSize                 = str(config['ComputeMatrix']['binSize'])
+        afterRegionStartLength  = str(config['ComputeMatrix']['afterRegionStartLength'])
+        beforeRegionStartLength = str(config['ComputeMatrix']['beforeRegionStartLength'])
+        referencePoint          = str(config['ComputeMatrix']['referencePoint'])
+        numberOfProcessors      = str(config['ComputeMatrix']['numberOfProcessors'])
     shell:
-        "computeMatrix reference-point -S {input} -R {params.GTF} -o {output} -a 3000 -b 3000 --binSize 2>{log}"
+        """
+        computeMatrix reference-point \
+        -S {input} -R {params.GTF} -o {output} \
+        -a {params.afterRegionStartLength} \
+        -b {params.beforeRegionStartLength} \
+        --referencePoint {params.referencePoint}
+        --binSize {params.binSize} \
+        --skipZeros \
+        2>{log}
+        """
 
 rule plotHeatmap:
     input:
         RESULT_DIR + "computematrix/ComputeMatrix.gz"
     output:
         RESULT_DIR + "heatmap/heatmap_reference_point_genes.pdf"
+    log:
+        RESULT_DIR + "logs/heatmap/heatmap.log"
     conda:
         "../envs/deeptools.yaml"
     message:
         "Plotting heatmap."
+    params:
+        dpi                     = str(config['plotHeatmap']['dpi'])
+        yMin                    = str(config['plotHeatmap']['yMin'])
+        yMax                    = str(config['plotHeatmap']['yMax'])
+        refPointLabel           = str(config['plotHeatmap']['refPointLabel'])
+        colorList               = str(config['plotHeatmap']['colorList'])
     shell:
-        "plotHeatmap -m {input} -o {output}"
+        """
+        plotHeatmap -m {input} -o {output} \
+        --yMin {params.yMin} \
+        --yMax {params.yMax} \
+        --refPointLabel {params.refPointLabel} \
+        --colorList {params.colorList} 2>{log}"
+        """
+
+rule plotProfile:
+    input:
+        RESULT_DIR + "computematrix/ComputeMatrix.gz"
+    output:
+        RESULT_DIR + "profile/profile_reference_point_genes.pdf"
+    log:
+        RESULT_DIR + "logs/profile/profile.log"
+    conda:
+        "../envs/deeptools.yaml"
+    message:
+        "Plotting profile."
+    params:
+        dpi                     = str(config['plotProfile']['dpi'])
+        colors                  = str(config['plotProfile']['colors'])
+    shell:
+        """
+        plotProfile -m {input} \
+        -out {output} \
+        --dpi {params.dpi} \
+        --colors {params.colors} \
+        --perGroup 2>{log}
+        """
