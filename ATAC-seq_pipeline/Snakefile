@@ -50,7 +50,7 @@ wildcard_constraints:
 # HMMRATAC will not work with the test dataset.
 
 GFT                 =       WORKING_DIR           + "gtf_gene.gtf"
-FASTQC              =       expand(RESULT_DIR     + "fastqc/sample_{numbers}_{R}_fastqc.html",numbers = ['8','12','4_3','4_1'], R=['R1', 'R2']),
+FASTQC              =       expand(RESULT_DIR     + "fastqc/sample_{numbers}_{R}_fastqc.html",numbers = ['8','12','4_7','4_1'], R=['R1', 'R2']),
 FORWARD_READS       =       expand(WORKING_DIR    + "trimmed/{samples}_forward.fastq.gz", samples = SAMPLES),
 REVERSE_READS       =       expand(WORKING_DIR    + "trimmed/{samples}_reverse.fastq.gz", samples = SAMPLES),
 TRIMMED_FASTQC      =       expand(RESULT_DIR     + "trimmed_fastqc/{samples}_{direction}_fastqc.html", samples = SAMPLES, direction=['forward', 'reverse']),
@@ -70,7 +70,7 @@ PCAPLOT             =       RESULT_DIR            + "PCA/PCA_PLOT.pdf"
 MATRIX              =       RESULT_DIR            + "computematrix/ComputeMatrix.gz"
 HEATMAP             =       RESULT_DIR            + "heatmap/heatmap_reference_point_genes.pdf"
 CORRELATION         =       RESULT_DIR            + "correlation/correlation.pdf"
-HISTOGRAM           =       RESULT_DIR            + "bamPEFragmentSize/histogram.png"
+HISTOGRAM           =       RESULT_DIR            + "bamPEFragmentSize/histogram.pdf"
 PROFILE             =       RESULT_DIR            + "profile/profile_reference_point_genes.pdf"
 
 container: "docker://continuumio/miniconda3:4.4.10"
@@ -78,7 +78,7 @@ container: "docker://continuumio/miniconda3:4.4.10"
 rule all:
     input:
         GFT,
-        FASTQC,
+        #FASTQC,
         FORWARD_READS,
         REVERSE_READS,
         TRIMMED_FASTQC,
@@ -91,7 +91,7 @@ rule all:
         BIGWIGSUMMARY,
         PCAPLOT,
         SORTED_INDEXED,
-        #NARROWPEAK,
+        NARROWPEAK,
         #HMMRATAC,
         MATRIX,
         HEATMAP,

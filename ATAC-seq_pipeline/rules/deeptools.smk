@@ -3,9 +3,9 @@
 #########################
 rule bamPEFragmentSize:
     input:
-        lambda wildcards: expand(WORKING_DIR + "mapped/{sample}.bam", sample = SAMPLES)
+        lambda wildcards: expand(WORKING_DIR + "sort/{sample}.sorted.bam", sample = SAMPLES)
     output:
-        histogram               = RESULT_DIR + "bamPEFragmentSize/histogram.png"
+        histogram               = RESULT_DIR + "bamPEFragmentSize/histogram.pdf"
     conda:
         "../envs/deeptools.yaml"
     message:
@@ -26,8 +26,7 @@ rule bamPEFragmentSize:
         --binSize {params.binSize} \
         --plotFileFormat {params.plotFileFormat} \
         --samplesLabel {params.samplesLabel} \
-        -T {params.plotTitle} \
-        --table 2>{log}
+        -T {params.plotTitle} 2>{log}
         """
 
 rule bamCoverage:
@@ -167,11 +166,11 @@ rule plotHeatmap:
         colorList                = str(config['plotHeatmap']['colorList'])
     shell:
         """
-        plotHeatmap -m {input} -o {output} \
+        plotHeatmap -m {input} -out {output} \
         --yMin {params.yMin} \
         --yMax {params.yMax} \
         --refPointLabel {params.refPointLabel} \
-        --colorList {params.colorList} 2>{log}"
+        --colorList {params.colorList} 2>{log}
         """
 
 rule plotProfile:

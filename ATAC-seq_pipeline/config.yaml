@@ -69,12 +69,12 @@ plotHeatmap:
   yMin: "0"
   yMax: "50"
   refPointLabel: "TSS"
-  colorList: "white, blue"
+  colorList: "'white, blue'"
 
 # plotProfile
 plotProfile:
   dpi: "100"
-  colors: "red blue"
+  colors: "red blue yellow green"
 
 # plotCorrelation
 plotCorrelation:
@@ -87,4 +87,4 @@ bamPEFragmentSize:
   numberOfProcessors: "10"
   plotFileFormat: "pdf"
   samplesLabel: "sample1 sample2 sample3 sample4"
-  plotTitle: "Fragment size of PE ATAC-seq data"
+  plotTitle: "'Fragment size of PE ATAC-seq data'"

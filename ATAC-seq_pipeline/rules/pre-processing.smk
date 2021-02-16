@@ -62,10 +62,10 @@ rule trimmed_fastqc:
 
 rule fastqc:
     input:
-        fwd = expand(DATA_DIR + "sample_{numbers}_R1.fastq.gz", numbers = ['8','12','4_3','4_1']),
-        rev = expand(DATA_DIR + "sample_{numbers}_R2.fastq.gz", numbers = ['8','12','4_3','4_1'])
+        fwd = expand(DATA_DIR + "sample_{numbers}_R1.fastq.gz", numbers = ['8','12','4_7','4_1']),
+        rev = expand(DATA_DIR + "sample_{numbers}_R2.fastq.gz", numbers = ['8','12','4_7','4_1'])
     output:
-        expand(RESULT_DIR + "fastqc/sample_{numbers}_{R}_fastqc.html", numbers = ['8','12','4_3','4_1'], R=['R1', 'R2'])
+        expand(RESULT_DIR + "fastqc/sample_{numbers}_{R}_fastqc.html", numbers = ['8','12','4_7','4_1'], R=['R1', 'R2'])
     log:
         expand(RESULT_DIR + "logs/fastqc/{samples}.fastqc.log", samples = SAMPLES)
     params:

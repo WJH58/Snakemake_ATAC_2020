@@ -1,5 +1,5 @@
 sample	fq1	fq2
 WT1	../data/sample_4_1_R1.fastq.gz	../data/sample_4_1_R2.fastq.gz
 WT2	../data/sample_8_R1.fastq.gz	../data/sample_8_R2.fastq.gz
-KO1	../data/sample_4_3_R1.fastq.gz	../data/sample_4_3_R2.fastq.gz
+KO1	../data/sample_4_7_R1.fastq.gz	../data/sample_4_7_R2.fastq.gz
 KO2	../data/sample_12_R1.fastq.gz	../data/sample_12_R2.fastq.gz

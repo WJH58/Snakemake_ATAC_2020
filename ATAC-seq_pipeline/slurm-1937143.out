@@ -1,0 +1,16 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 8
+Rules claiming more threads will be scaled down.
+Singularity containers: ignored
+Job counts:
+	count	jobs
+	1	all
+	1
+
+[Tue Feb 16 10:55:48 2021]
+Job 0: Analysis is complete!
+
+[Tue Feb 16 10:55:48 2021]
+Finished job 0.
+1 of 1 steps (100%) done
