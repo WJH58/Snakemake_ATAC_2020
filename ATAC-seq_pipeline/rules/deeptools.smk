@@ -86,6 +86,8 @@ rule plotCorrelation:
     params:
         corMethod               = str(config['plotCorrelation']['corMethod']),
         whatToPlot              = str(config['plotCorrelation']['whatToPlot'])
+    conda:
+        "../envs/deeptools.yaml"
     message:
         "Plotting correlation."
     shell:

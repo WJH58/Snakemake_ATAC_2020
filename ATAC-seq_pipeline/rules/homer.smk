@@ -9,7 +9,7 @@ rule annotation:
     message:
         "Using Homer to annotate {wildcards.samples} peak-calling file"
     log:
-        RESULT_DIR + "logs/annotation/annotate.log"
+        RESULT_DIR + "logs/annotation/{samples}_homer.log"
     conda:
         "../envs/homer.yaml"
     shell:
