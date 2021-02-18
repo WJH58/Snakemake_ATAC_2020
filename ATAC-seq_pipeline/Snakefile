@@ -72,7 +72,8 @@ HEATMAP             =       RESULT_DIR            + "heatmap/heatmap_reference_p
 CORRELATION         =       RESULT_DIR            + "correlation/correlation.pdf",
 HISTOGRAM           =       RESULT_DIR            + "bamPEFragmentSize/histogram.pdf",
 PROFILE             =       RESULT_DIR            + "profile/profile_reference_point_genes.pdf",
-ANNOTATION          =       expand(RESULT_DIR     + "annotation/{samples}_annotate_homer.txt", samples = SAMPLES)
+ANNOTATION          =       expand(RESULT_DIR     + "annotation/{samples}_annotate_homer.txt", samples = SAMPLES),
+MULTIQC             =       RESULT_DIR            + "trimmed_fastqc/multiqc_report.html"
 
 container: "docker://continuumio/miniconda3:4.4.10"
 
@@ -99,7 +100,8 @@ rule all:
         CORRELATION,
         HISTOGRAM,
         PROFILE,
-	ANNOTATION,
+	    ANNOTATION,
+        MULTIQC,
 
 
     message : "Analysis is complete!"
