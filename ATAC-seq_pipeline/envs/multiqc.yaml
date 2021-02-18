@@ -1,4 +1,4 @@
 channels:
   - bioconda
 dependencies:
-  - hmmratac=4.11
+  - multiqc=1.9

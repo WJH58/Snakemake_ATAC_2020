@@ -60,6 +60,18 @@ rule trimmed_fastqc:
     shell:
         "fastqc --outdir={params} {input.forward_reads} {input.reverse_reads} &>{log}"
 
+rule multiQC:
+    output:
+        multiqc = RESULT_DIR + "trimmed_fastqc/multiqc_report.html"
+    conda:
+        "../envs/multiqc.yaml"
+    log:
+        RESULT_DIR + "logs/multiqc/multiqc.log"
+    message:
+        "Giving summary of fastqc report across samples."
+    shell:
+        "multiqc results/trimmed_fastqc 2>{log}"
+
 rule fastqc:
     input:
         fwd = expand(DATA_DIR + "sample_{numbers}_R1.fastq.gz", numbers = ['8','12','4_7','4_1']),
