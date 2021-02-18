@@ -67,10 +67,12 @@ rule multiQC:
         "../envs/multiqc.yaml"
     log:
         RESULT_DIR + "logs/multiqc/multiqc.log"
+    params:
+        out_folder = RESULT_DIR + "trimmed_fastqc/"
     message:
         "Giving summary of fastqc report across samples."
     shell:
-        "multiqc results/trimmed_fastqc 2>{log}"
+        "multiqc results/trimmed_fastqc -o {params.out_folder} 2>{log}"
 
 rule fastqc:
     input:
