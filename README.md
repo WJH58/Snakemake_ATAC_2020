@@ -1,9 +1,16 @@
 # Snakemake pipepine for (Illumina) paired-end ATAC-Seq data
+[Overview](#anchor1)  
+[Computer for running Snakemake](#anchor2)
+[Quick start](#anchor3)  
+[Content of repository](#anchor4)
+[Output description](#anchor5)
+[What do rules do?](#anchor6)
+[Configuration file](#anchor7)
 
-## Overview
+## Overview {#anchor1}
 This pipeline implements an ATAC-seq data analysis workflow with Snakemake. The workflow includes three parts: pre-analysis, core analysis and downstream analysis. Starting from downloading raw data in fasta format, it runs basic QC reporting, reads trimming, alignment, peak calling and downstream analysis.
 
-The expected outputs (see description [here](#anchor1)) of this pipeline are:
+The expected outputs of this pipeline are:
 * fastqc reports before and after trimming in _html_ format and a single multiQC report summary across all samples
 * alignment files in _bed_ format.
 * peak calling information by macs2, including _narrowPeak_ files.
@@ -16,7 +23,7 @@ The expected outputs (see description [here](#anchor1)) of this pipeline are:
   * PCA plot
 * annotation files for each sample by [Homer](http://homer.ucsd.edu/homer/ngs/annotation.html).
 
-## Computer for running Snakemake
+## Computer for running Snakemake {#anchor2}
 Snakemake can work on any computer. To perform it on cluster computer like Slurm, we provide a script named "slurm_minisnakemake.sh" to kick it off. Do ``` nano slurm_minisnakemake.sh``` to modify the ```job-name``` and your email address after ```--mail-user```. Look for more information about cluster computer [SLURM](https://git.lumc.nl/shark/shark-centos-slurm-user-guide/-/wikis/home).  
 ![workflow](photos/dag.png)
 
@@ -46,7 +53,7 @@ echo End time : `date`
 ```
 We have included "slurm-cluster-status.py" file which reports the job status while running.
 
-## Quick Start
+## Quick Start {#anchor3}
 
 ### 1. Git clone the repository
 Try ``` git clone https://github.com/JihedC/Snakemake_ATAC_2020.git ``` to download the pipeline.
@@ -64,7 +71,7 @@ This pipeline relies on [conda](https://docs.conda.io/en/latest/miniconda.html) 
 
 The snakefile contains information about the required packages for the pipeline and will ensure the reproducibility of the analysis.
 
-### Content of the repository  
+### Content of the repository {#anchor4}
 * The **Snakefile** is the core of the Snakemake workflow. It ensures the reproducibility of the analysis by setting a set of rules and environments that will produce the desired outputs. This file is hard coded and should **not** be modified by unexperienced users.
 
 * **Config.yaml** contains all the parameters you want to refer to, such as directory paths, genome file link, rule parameters, etc. You can also save those rarely-modified files such as ```genome.info``` in the configuration file. **Note: all paths in snakemake files are relative!** You can modify ```Config.yaml``` to make your pipeline more flexible: genome fasta, gene annotation, deeptools parameters, etc.
@@ -114,7 +121,7 @@ Within the folder containing the Snakefile, simply run this command line ```Snak
 
 Or, run snakemake on user node on Slurm by typing ```sbatch slurm_minisnakemake```. This command line will allocate snakemake jobs to available computer nodes. Check job status by ```squeue -u <username>```, where "R" means running and "PD" means pending. View the progress of each job by ```less slurm-*.out```.
 
-## Output description {#anchor1}
+## Output description {#anchor5}
 
 The desired output of this pipeline are:
 
@@ -129,7 +136,7 @@ The desired output of this pipeline are:
 * **PCA plot** A PCA plot giving deeper insights into similarity between samples is storede in /results/PCA/ folder.
 * **annotation** Each sample has an annotation.txt file in results/annotation/ folder.  
 
-## What do rules do?  
+## What do rules do? {#anchor6}
 * pre-processing.smk:
   * **rule trimmomatic:** Trim the adapters and N bases.
   * **rule trimmed_fastqc:** As confirmation, check the quality again after reads are trimmed.
@@ -157,7 +164,7 @@ The desired output of this pipeline are:
   * **rule bamPEFragmentSize:** Generate a histogram that display distribution of fragment sizes.  
   * **rule plotCorrelation:** Plot a correlation heatmap that shows how similar samples are with each other.  
 
-## Configuration file  
+## Configuration file {#anchor7}
 * working_dir: a directory that contains temporary files.
 * result_dir: a directory taht contains desired output files
 * data_dir: a directory that stores all the sample data. Sample paths in units.tsv direct here
