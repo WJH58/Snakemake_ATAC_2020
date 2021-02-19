@@ -3,7 +3,7 @@
 ## Overview
 This pipeline implements an ATAC-seq data analysis workflow with Snakemake. The workflow includes three parts: pre-analysis, core analysis and downstream analysis. Starting from downloading raw data in fasta format, it runs basic QC reporting, reads trimming, alignment, peak calling and downstream analysis.
 
-The expected outputs (see [description here](#anchor)) of this pipeline are:
+The expected outputs (see description [here](#anchor1)) of this pipeline are:
 * fastqc reports before and after trimming in _html_ format and a single multiQC report summary across all samples
 * alignment files in _bed_ format.
 * peak calling information by macs2, including _narrowPeak_ files.
@@ -14,11 +14,11 @@ The expected outputs (see [description here](#anchor)) of this pipeline are:
   * profile plot
   * correlation heatmap
   * PCA plot
-* annotation files for each sample by Homer
+* annotation files for each sample by [Homer](http://homer.ucsd.edu/homer/ngs/annotation.html).
 
 ## Computer for running Snakemake
-Snakemake can work on any computer. To perform it on cluster computer like Slurm, we provide a script named "slurm_minisnakemake.sh" to kick it off. Do ``` nano slurm_minisnakemake.sh``` to modify the ```job-name``` and your email address after ```--mail-user```. Look for more information about cluster computer [SLURM](https://git.lumc.nl/shark/shark-centos-slurm-user-guide/-/wikis/home).
-![workflow](../photos/dag.png)
+Snakemake can work on any computer. To perform it on cluster computer like Slurm, we provide a script named "slurm_minisnakemake.sh" to kick it off. Do ``` nano slurm_minisnakemake.sh``` to modify the ```job-name``` and your email address after ```--mail-user```. Look for more information about cluster computer [SLURM](https://git.lumc.nl/shark/shark-centos-slurm-user-guide/-/wikis/home).  
+![workflow](photos/dag.png)
 
 ```
 #! /bin/bash
@@ -114,7 +114,7 @@ Within the folder containing the Snakefile, simply run this command line ```Snak
 
 Or, run snakemake on user node on Slurm by typing ```sbatch slurm_minisnakemake```. This command line will allocate snakemake jobs to available computer nodes. Check job status by ```squeue -u <username>```, where "R" means running and "PD" means pending. View the progress of each job by ```less slurm-*.out```.
 
-## Output description {#anchor}
+## Output description {#anchor1}
 
 The desired output of this pipeline are:
 
