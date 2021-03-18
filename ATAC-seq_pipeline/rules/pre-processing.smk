@@ -62,24 +62,24 @@ rule trimmed_fastqc:
 
 rule multiQC:
     output:
-        multiqc = RESULT_DIR + "trimmed_fastqc/multiqc_report.html"
+        multiqc = RESULT_DIR + "multiqc/multiqc_report.html"
     conda:
         "../envs/multiqc.yaml"
     log:
         RESULT_DIR + "logs/multiqc/multiqc.log"
     params:
-        out_folder = RESULT_DIR + "trimmed_fastqc/"
+        out_folder = RESULT_DIR + "multiqc/"
     message:
         "Giving summary of fastqc report across samples."
     shell:
-        "multiqc results/trimmed_fastqc -o {params.out_folder} 2>{log}"
+        "multiqc . -o {params.out_folder} 2>{log}"
 
 rule fastqc:
     input:
-        fwd = expand(DATA_DIR + "sample_{numbers}_R1.fastq.gz", numbers = ['8','12','4_7','4_1']),
-        rev = expand(DATA_DIR + "sample_{numbers}_R2.fastq.gz", numbers = ['8','12','4_7','4_1'])
+        fwd = expand(DATA_DIR + "sample_{numbers}_R1.fastq.gz", numbers = ['8','12','4_3','4_1']),
+        rev = expand(DATA_DIR + "sample_{numbers}_R2.fastq.gz", numbers = ['8','12','4_3','4_1'])
     output:
-        expand(RESULT_DIR + "fastqc/sample_{numbers}_{R}_fastqc.html", numbers = ['8','12','4_7','4_1'], R=['R1', 'R2'])
+        expand(RESULT_DIR + "fastqc/sample_{numbers}_{R}_fastqc.html", numbers = ['8','12','4_3','4_1'], R=['R1', 'R2'])
     log:
         expand(RESULT_DIR + "logs/fastqc/{samples}.fastqc.log", samples = SAMPLES)
     params:

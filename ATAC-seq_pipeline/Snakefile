@@ -50,7 +50,7 @@ wildcard_constraints:
 # HMMRATAC will not work with the test dataset.
 
 GFT                 =       WORKING_DIR           + "gtf_gene.gtf",
-FASTQC              =       expand(RESULT_DIR     + "fastqc/sample_{numbers}_{R}_fastqc.html",numbers = ['8','12','4_7','4_1'], R=['R1', 'R2']),
+FASTQC              =       expand(RESULT_DIR     + "fastqc/sample_{numbers}_{R}_fastqc.html",numbers = ['8','12','4_3','4_1'], R=['R1', 'R2']),
 FORWARD_READS       =       expand(WORKING_DIR    + "trimmed/{samples}_forward.fastq.gz", samples = SAMPLES),
 REVERSE_READS       =       expand(WORKING_DIR    + "trimmed/{samples}_reverse.fastq.gz", samples = SAMPLES),
 TRIMMED_FASTQC      =       expand(RESULT_DIR     + "trimmed_fastqc/{samples}_{direction}_fastqc.html", samples = SAMPLES, direction=['forward', 'reverse']),
@@ -73,7 +73,7 @@ CORRELATION         =       RESULT_DIR            + "correlation/correlation.pdf
 HISTOGRAM           =       RESULT_DIR            + "bamPEFragmentSize/histogram.pdf",
 PROFILE             =       RESULT_DIR            + "profile/profile_reference_point_genes.pdf",
 ANNOTATION          =       expand(RESULT_DIR     + "annotation/{samples}_annotate_homer.txt", samples = SAMPLES),
-MULTIQC             =       RESULT_DIR            + "trimmed_fastqc/multiqc_report.html"
+MULTIQC             =       RESULT_DIR            + "multiqc/multiqc_report.html"
 
 container: "docker://continuumio/miniconda3:4.4.10"
 
@@ -100,7 +100,7 @@ rule all:
         CORRELATION,
         HISTOGRAM,
         PROFILE,
-	    ANNOTATION,
+        #ANNOTATION,
         MULTIQC,
 
 
