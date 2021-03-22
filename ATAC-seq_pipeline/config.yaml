@@ -51,13 +51,13 @@ macs2:
 # binSize parameters is set to 1000bp to test quickly the pipeline. Change to a lower value with real samples.
 bamCoverage:
   effectiveGenomeSize: "2652783500"
-  normalization: "RPKM"
-  binSize: "1000"
+  normalization: "RPKM" # Alterntively choose "RPGC", "CPM", "BPM". If you don't specify this argument, by default no normalization method will be used.
+  binSize: "50"
 
 # computeMatrix
 ComputeMatrix:
   GTF: "gencode.vM25.annotation.gtf"
-  binSize: "10"
+  binSize: "1000" # Test the pipelin with binSize=1000; please set it at a small number (e.g.10) when run it with real data.
   afterRegionStartLength: "3000"
   beforeRegionStartLength: "3000"
   referencePoint: "TSS"
@@ -67,24 +67,24 @@ ComputeMatrix:
 plotHeatmap:
   dpi: "100"
   yMin: "0"
-  yMax: "50"
-  refPointLabel: "TSS"
-  colorList: "'white, blue'"
+  yMax: "50" # Set a proper number to make the heatmap profile look better.
+  refPointLabel: "TSS" # Specify the reference point label by yourself, e.g. "Center".
+  colorList: "'white, blue'" # Blue in center, surrounded by white.
 
 # plotProfile
 plotProfile:
   dpi: "100"
-  colors: "red blue yellow green"
+  colors: "red blue yellow green" # Please define colors of profile. The number of colors should be consistent with the number of samples.
 
 # plotCorrelation
 plotCorrelation:
-  corMethod: "pearson"
-  whatToPlot: "heatmap"
+  corMethod: "pearson" # Alternatively "spearman" could be used.
+  whatToPlot: "heatmap" # Alterntively "scatterplot" could be used.
 
 # bamPEFragmentSize
 bamPEFragmentSize:
-  binSize: "1000"
-  numberOfProcessors: "10"
-  plotFileFormat: "pdf"
-  samplesLabel: "sample1 sample2 sample3 sample4"
-  plotTitle: "'Fragment size of PE ATAC-seq data'"
+  binSize: "1000"  #This is default value.
+  numberOfProcessors: "10" #Grant 10 processors to make it run faster.
+  plotFileFormat: "pdf" # pdf has higher resolution than png.
+  samplesLabel: "sample1 sample2 sample3 sample4" # General labels are used here. You can change sample names.
+  plotTitle: "'Fragment size of PE ATAC-seq data'" # General title is used here. You can name it.
