@@ -66,6 +66,8 @@ rule multibigwigSummary:
         bigwigsummary           = RESULT_DIR + "bigwigsummary/multiBigwigSummary.npz"
     log:
         RESULT_DIR + "logs/bigwigsummary/multiBigwigSummary.log"
+    params:
+        binSize                 = str(config['multiBigwigSummary']['binSize'])
     conda:
         "../envs/deeptools.yaml"
     message:
@@ -73,7 +75,7 @@ rule multibigwigSummary:
     shell:
         """
         multiBigwigSummary bins -b {input} \
-        -o {output}
+        -o {output} -bs {params.binSize}
         """
 
 rule plotCorrelation:

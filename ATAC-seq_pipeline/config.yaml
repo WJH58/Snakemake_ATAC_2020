@@ -87,3 +87,7 @@ bamPEFragmentSize:
   plotFileFormat: "pdf"                             # pdf has higher resolution than png.
   samplesLabel: "sample1 sample2 sample3 sample4"   # General labels are used here. You can change sample names.
   plotTitle: "'Fragment size of PE ATAC-seq data'"  # General title is used here. You can name it.
+
+# multiBigwigSummary
+multiBigwigSummary:
+  binSize: "10"                                     # Set binSize at a small number to increase resolution of correlation heatmap.
