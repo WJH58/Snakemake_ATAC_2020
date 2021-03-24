@@ -75,7 +75,7 @@ rule multibigwigSummary:
     shell:
         """
         multiBigwigSummary bins -b {input} \
-        -o {output} -bs {params.binSize}
+        -o {output} -bs {params.binSize} 2> {log}
         """
 
 rule plotCorrelation:
