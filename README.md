@@ -13,7 +13,6 @@ The expected outputs of this pipeline are:
   * profile plot
   * correlation heatmap
   * PCA plot
-* annotation files for each sample by [Homer](http://homer.ucsd.edu/homer/ngs/annotation.html).
 
 ## Computer for running Snakemake  
 Snakemake can work on any computer. To perform it on cluster computer like Slurm, we provide a script named "slurm_minisnakemake.sh" to kick it off. Do ``` nano slurm_minisnakemake.sh``` to modify the ```job-name``` and your email address after ```--mail-user```. Look for more information about cluster computer [SLURM](https://git.lumc.nl/shark/shark-centos-slurm-user-guide/-/wikis/home).  
@@ -126,7 +125,6 @@ The desired output of this pipeline are:
 * **Read density heatmap** A read density heatmap over reference point is stored in /results/heatmap/ folder.  
 * **Profile** A profile plot showing peak coverage for all samples over reference point is stored in /results/profile/ folder.  
 * **PCA plot** A PCA plot giving deeper insights into similarity between samples is storede in /results/PCA/ folder.
-* **annotation** Each sample has an annotation.txt file in results/annotation/ folder.  
 
 ## What do rules do?  
 * pre-processing.smk:
