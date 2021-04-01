@@ -5,7 +5,7 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user j.wang@lumc.nl
 #SBATCH -t 48:00:00
-#SBATCH --mem=60000
+#SBATCH --mem=48G
 
 
 echo Start time : `date`
@@ -21,4 +21,3 @@ snakemake -p \
 
 
 echo End time : `date`
-
