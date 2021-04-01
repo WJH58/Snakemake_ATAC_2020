@@ -99,12 +99,9 @@ rule mapping:
         reverseUnpaired = WORKING_DIR + "trimmed/{samples}_reverse_unpaired.fastq.gz",
         index = [WORKING_DIR + "genome." + str(i) + ".bt2" for i in range(1,4)]
     output:
-        mapped = WORKING_DIR + "mapped/{samples}.bam",
-        unmapped = [WORKING_DIR + "unmapped/{samples}.fq." + str(i) +".gz" for i in range(1,2)],
+        mapped = WORKING_DIR + "mapped/{samples}.bam"
     params:
-        bowtie          = " ".join(config["bowtie2"]["params"].values()), #take argument separated as a list separated with a space
         index           = WORKING_DIR + "genome",
-        unmapped        = WORKING_DIR + "unmapped/{samples}.fq.gz"
     threads: 10
     conda:
         "../envs/samtools_bowtie.yaml"
