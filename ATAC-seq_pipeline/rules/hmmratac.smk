@@ -9,6 +9,7 @@
 
 rule download_hmmratac:
     output:
+        touch(WORKING_DIR + "hmmratac.java")
     params:
         hmmratac = config["HMMRATAC"]
     log:
@@ -29,7 +30,7 @@ rule hmmratac:
         RESULT_DIR + "logs/hmmratac/{samples}_hmmratac.log"
     shell:
         """
-        java -jar HMMRATAC_V1.2.10_exe.jar -b {input.map_sorted} \
+        java -Xmx46G -jar HMMRATAC_V1.2.10_exe.jar -b {input.map_sorted} \
         -i {input.map_sorted_indexed} \
         -g {params.genome_info} \
         -o {params.output_preflix} \

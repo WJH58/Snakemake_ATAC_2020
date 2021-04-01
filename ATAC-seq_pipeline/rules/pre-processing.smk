@@ -114,11 +114,9 @@ rule mapping:
         RESULT_DIR + "logs/bowtie/{samples}.log"
     shell:
         """
-        bowtie2 {params.bowtie} --threads {threads} \
+        bowtie2 --very-sensitive --threads {threads}  \
         -x {params.index} -1 {input.forward_reads} \
-        -2 {input.reverse_reads} \
-        -U {input.forwardUnpaired},{input.reverseUnpaired} \
-        --un-conc-gz {params.unmapped} --no-mixed | samtools view -Sb - > {output.mapped} 2>{log}
+        -2 {input.reverse_reads} | samtools view -Sb -|samtools sort > {output.mapped} 2>{log}
         """
 
 rule sort:

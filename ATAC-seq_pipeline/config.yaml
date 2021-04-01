@@ -39,7 +39,7 @@ bowtie2:
 
 # genome.info
 hmmratac:
-  genome.info: "genome.info"
+  genome.info: "chr22.genome"
 
 # macs2
 macs2:
@@ -90,4 +90,4 @@ bamPEFragmentSize:
 
 # multiBigwigSummary
 multiBigwigSummary:
-  binSize: "10"                                     # Set binSize at a small number to increase resolution of correlation heatmap.
+  binSize: "50"                                     # Set binSize at a small number to increase resolution of correlation heatmap.
