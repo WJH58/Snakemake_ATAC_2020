@@ -39,7 +39,7 @@ bowtie2:
 
 # genome.info
 hmmratac:
-  genome.info: "chr22.genome"
+  genome.info: "genome.info"
 
 # macs2
 macs2:
