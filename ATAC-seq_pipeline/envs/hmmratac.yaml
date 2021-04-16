@@ -1,0 +1,4 @@
+channels:
+  - bioconda
+dependencies:
+  - hmmratac=1.2.10

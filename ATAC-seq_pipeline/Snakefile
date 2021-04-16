@@ -72,7 +72,6 @@ CORRELATION         =       RESULT_DIR            + "correlation/correlation.pdf
 HISTOGRAM           =       RESULT_DIR            + "bamPEFragmentSize/histogram.pdf",
 PROFILE             =       RESULT_DIR            + "profile/profile_reference_point_genes.pdf",
 MULTIQC             =       RESULT_DIR            + "multiqc/multiqc_report.html",
-HMMRATAC_TOOL       =       WORKING_DIR          + "hmmratac.java"
 
 container: "docker://continuumio/miniconda3:4.4.10"
 
@@ -93,7 +92,6 @@ rule all:
         SORTED_INDEXED,
         NARROWPEAK,
         HMMRATAC,
-        HMMRATAC_TOOL,
         MATRIX,
         HEATMAP,
         CORRELATION,
