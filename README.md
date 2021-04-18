@@ -15,13 +15,13 @@ The expected outputs of this pipeline are:
   * PCA plot
 
 ## Computer for running Snakemake  
-Snakemake can work on any computer. To perform it on cluster computer like Slurm, we provide a script named "slurm_minisnakemake.sh" to kick it off. Do ``` nano slurm_minisnakemake.sh``` to modify the ```job-name``` and your email address after ```--mail-user```. Look for more information about cluster computer [SLURM](https://git.lumc.nl/shark/shark-centos-slurm-user-guide/-/wikis/home).  
+Snakemake can work on any computer. To perform it on cluster computer like Slurm, we provide a script named "slurm_snakemake.sh" to kick it off. Do ``` nano slurm_snakemake.sh``` to modify the ```job-name``` and your email address after ```--mail-user```. Look for more information about cluster computer [SLURM](https://git.lumc.nl/shark/shark-centos-slurm-user-guide/-/wikis/home).  
 ![workflow](photos/dag.png)
 
 ```
 #! /bin/bash
 
-#SBATCH  --job-name=mini_snakemake # You can change the job name.
+#SBATCH  --job-name=snakemake # You can change the job name.
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user # Please insert your mail!
 #SBATCH -t 48:00:00
@@ -100,7 +100,7 @@ This pipeline includes a set of small fastq files of mouse genomic data for test
 How to make a test run:  
 1. Activate snakemake environment by ```conda activate snakemake```.  
 2. Go to Snakemake_ATAC_2020/ATAC-seq_pipeline/ folder and do ```snakemake -np``` to make a dry run to test whether the workflow is defined properly.  
-3. If no error messages occur during dry run, start a real run. You can either do it in an interactive session by typing ```snakemake --use-conda --cores n```; or on the node by typing ```sbatch slurm_minisnakemake.sh``` to hand in the submission script to Slurm.
+3. If no error messages occur during dry run, start a real run. You can either do it in an interactive session by typing ```snakemake --use-conda --cores n```; or on the node by typing ```sbatch slurm_snakemake.sh``` to hand in the submission script to Slurm.
 
 ### 5. Snakemake execution  
 
@@ -110,7 +110,7 @@ After activating snakemake environment, use command ```snakemake -np``` to perfo
 * Real run
 Within the folder containing the Snakefile, simply run this command line ```Snakemake --use-conda --cores n ```. n is the number of cores you want to dedicate for the analysis.
 
-Or, run snakemake on user node on Slurm by typing ```sbatch slurm_minisnakemake```. This command line will allocate snakemake jobs to available computer nodes. Check job status by ```squeue -u <username>```, where "R" means running and "PD" means pending. View the progress of each job by ```less slurm-*.out```.
+Or, run snakemake on user node on Slurm by typing ```sbatch slurm_snakemake```. This command line will allocate snakemake jobs to available computer nodes. Check job status by ```squeue -u <username>```, where "R" means running and "PD" means pending. View the progress of each job by ```less slurm-*.out```.
 
 ## Output description  
 

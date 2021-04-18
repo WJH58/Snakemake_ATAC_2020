@@ -98,6 +98,8 @@ rule plotCorrelation:
         --corMethod {params.corMethod} \
         --whatToPlot {params.whatToPlot} \
         -o {output} \
+        --plotNumbers \
+        --colorMap YlGn \
         --skipZeros 2>{log}
         """
 
@@ -118,7 +120,7 @@ rule PCA:
         """
         plotPCA -in {input} \
         -o {output} \
-        --transpose \ 
+        --transpose \
         2>{log}
         """
 
