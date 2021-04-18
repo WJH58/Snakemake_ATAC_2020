@@ -118,6 +118,7 @@ rule PCA:
         """
         plotPCA -in {input} \
         -o {output} \
+        --transpose \ 
         2>{log}
         """
 

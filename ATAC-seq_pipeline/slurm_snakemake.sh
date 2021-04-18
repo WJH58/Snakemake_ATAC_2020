@@ -1,7 +1,7 @@
 #! /bin/bash
 
 #SBATCH --partition=highmem
-#SBATCH  --job-name=mini_snakemake
+#SBATCH  --job-name=snakemake
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user j.wang@lumc.nl
 #SBATCH -t 48:00:00
