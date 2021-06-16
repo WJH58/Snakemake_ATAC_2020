@@ -1,5 +1,5 @@
 #########################
-#Sets of rules for trimming, mapping, sorting and indexing of ATAC-seq reads.
+#Sets of rules for getting external data
 #########################
 
 rule download_genome:
